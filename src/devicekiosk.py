@@ -110,11 +110,11 @@ class UI(QObject):
         ticket += "\n\n\n----- IT Use -----\n\n\nTicket Number: \n\n\n\n\n\nDate Completed:\n\n\n\n\n\nAdditional Information"
         print(ticket)
         # TODO: Enable the following to actually print again
-        lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
-        lpr.communicate(bytes(ticket, 'utf-8'))
+        # lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
+        # lpr.communicate(bytes(ticket, 'utf-8'))
         self.enableNextSignal.emit()
 
-    @Signal()
+    @Slot()
     def submitDropOff(self):
         self.showDropoffSignal.emit()
         
