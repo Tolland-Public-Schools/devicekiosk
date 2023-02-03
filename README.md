@@ -1,9 +1,9 @@
-# clock
-Full Screen Clock app written in Python and QML
+# Device Kiosk
+Device repair dropoff kiosk app written in Python and QML
 
 Install pre-requisites:
 
-Qt 5.15.1 from https://www.qt.io/download-qt-installer
+Qt 6.2.4 from https://www.qt.io/download-qt-installer
 
 pip install PySide6
 
