@@ -7,6 +7,7 @@ Item {
     Connections {
         target: ui
         function onEnableNextSignal() {
+            txtMessage.text = "Ticket sumbmitted, please tap 'Next'"
             btnNext.enabled = true
         }
     }
@@ -20,7 +21,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Please wait while your ticket is submitted."
+            text: "Please wait while your ticket is submitted..."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
