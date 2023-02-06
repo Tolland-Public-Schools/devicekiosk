@@ -2,6 +2,7 @@ import sys
 import os
 import datetime
 import requests
+import json
 import tempfile
 import urllib.request
 import shutil
@@ -38,6 +39,7 @@ class UI(QObject):
     showLoanerSignal = Signal(None)
     showSubmitSignal = Signal(None)
     showReturnSignal = Signal(None)
+    showErrorSignal = Signal(str)
     
 
     emailAddress = ""
@@ -48,6 +50,7 @@ class UI(QObject):
     loanerDeviceBarcrod = ""
     serviceMode = Mode.dropoff
     schoolLogo = ""
+    zenDeskAPIToken = ""
     
 
     print(serviceMode)
@@ -136,9 +139,41 @@ class UI(QObject):
             self.showReturnSignal.emit()
 
     @Slot()
-    def submitTicket():
+    def submitTicket(self):
         print("submitting ticket")
+        path = os.path.dirname(os.path.abspath(__file__))
+        tokenPath = os.path.join(path,'apitoken.txt')
+        if (not os.path.exists(tokenPath)):
+            self.showErrorSignal.emit(tokenPath + " does not exist.")
+            return
+        with open(tokenPath, 'r') as file:
+            self.zenDeskAPIToken = file.read()
         
+        
+    def postToZenDesk(self):
+        # New ticket info
+        subject = 'My printer is on fire!'
+        body = self.description
+        requester = ""
+        # Package the data in a dictionary matching the expected JSON
+        # "requester": { "locale_id": 8, "name": "Pablo", "email": "pablito@example.org" }
+        data = {'ticket': {'subject': subject, 'comment': {'body': body}}}
+        # Encode the data to create a JSON payload
+        payload = json.dumps(data)
+        # Set the request parameters
+        url = 'https://tollandpublicschools.zendesk.com/api/v2/tickets.json'
+        user = 'asher@tolland.k12.ct.us/token'
+        pwd = self.zenDeskAPIToken
+        headers = {'content-type': 'application/json'}
+        # Do the HTTP post request
+        response = requests.post(url, data=payload, auth=(user, pwd), headers=headers)
+        # Check for HTTP codes other than 201 (Created)
+        if response.status_code != 201:
+            self.showErrorSignal.emit('Error: ' + response.status_code)
+            return
+        # Report success
+        print('Successfully created the ticket.')
+                
 
 if __name__ == "__main__":
     QGuiApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True) #enable highdpi scaling
