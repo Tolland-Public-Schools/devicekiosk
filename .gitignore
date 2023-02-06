@@ -1,5 +1,6 @@
 # Private
 apitoken.txt
+src/apitoken.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
