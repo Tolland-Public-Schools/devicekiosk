@@ -9,7 +9,7 @@ ApplicationWindow {
     // height: Constants.height
 
     visible: true
-    // visibility: Window.FullScreen
+    visibility: Window.FullScreen
     // visibility: Window.Maximized
     title: "Device Repair Kiosk"
 
