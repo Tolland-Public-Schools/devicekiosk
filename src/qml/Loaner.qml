@@ -6,7 +6,7 @@ import QtQuick.Layouts
 Item {
 
     function verifyForm() {
-        if (inputSerial.text.toString().length >= 0) {        
+        if (inputSerial.text.toString().length > 0) {        
             btnNext.enabled = true
         }
         else {

@@ -45,6 +45,7 @@ class UI(QObject):
     showReturnSignal = Signal(None)
     showErrorSignal = Signal(str)
     showErrorPageSignal = Signal(None)
+    showFinishSignal = Signal(None)
     
     firstName = ""
     lastName = ""
@@ -73,6 +74,10 @@ class UI(QObject):
     @Slot()
     def test(self):
         print("test")
+
+    @Slot()
+    def checkForErrors(self):
+        self.showErrorSignal.emit(self.errorMessage)
     
     # @Slot()
     # def showEmailScreen(self):
@@ -161,10 +166,15 @@ class UI(QObject):
         else:
             self.showReturnSignal.emit()
 
+    # Submit the QML form from Submit.qml
+    @Slot()
+    def submitTicketPage(self):
+        self.showFinishSignal.emit()
+
+    # Submit the ticket to ZenDesk
     @Slot()
     def submitTicket(self):
         print("submitting ticket")
-        # TODO: Uncomment after testing
         self.postToZenDesk()
         if (not self.errorMessage == ""):
             return

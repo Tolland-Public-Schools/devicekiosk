@@ -9,12 +9,6 @@ Item {
         function onEnableNextSignal() {
             btnNext.enabled = true
         }
-
-        function onShowErrorSignal(error) {
-            txtError.enabled = true
-            txtError.text = "Error: " + error
-            // console.log(error)
-        }
     }
 
     ColumnLayout {
@@ -32,23 +26,7 @@ Item {
             wrapMode: Text.WordWrap
             font.pointSize: 30
 
-        }
-
-        Text {
-            id: txtError
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-
-            text: ""
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            wrapMode: Text.WordWrap
-            font.pointSize: 30
-            enabled: false
-            color: "red"
-        }
-
-        
+        }        
 
         Button {
             id: btnNext
@@ -59,7 +37,7 @@ Item {
             Layout.fillHeight: true
 
             onClicked: {
-                ui.submitPrint()
+                ui.submitTicketPage()
             }
 
             // Component.onCompleted: {

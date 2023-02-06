@@ -9,7 +9,7 @@ ApplicationWindow {
     // height: Constants.height
 
     visible: true
-    visibility: Window.FullScreen
+    // visibility: Window.FullScreen
     // visibility: Window.Maximized
     title: "Device Repair Kiosk"
 
@@ -60,6 +60,10 @@ ApplicationWindow {
 
         function onShowReturnSignal() {
             contentFrame.push(Qt.createComponent("Return.qml"))
+        }
+
+        function onShowFinishSignal(error) {
+            contentFrame.push(Qt.createComponent("Finish.qml"))
         }
     }
 

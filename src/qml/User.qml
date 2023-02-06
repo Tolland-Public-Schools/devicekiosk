@@ -7,9 +7,9 @@ Item {
 
     function verifyForm() {
         if (
-            inputFirst.text.toString().length >= 0 &&
-            inputLast.text.toString().length >= 0 &&
-            inputID.text.toString().length >= 0
+            inputFirst.text.toString().length > 0 &&
+            inputLast.text.toString().length > 0 &&
+            inputID.text.toString().length > 0
         ) {        
             btnNext.enabled = true
         }
