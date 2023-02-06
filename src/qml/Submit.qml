@@ -17,10 +17,6 @@ Item {
         }
     }
 
-    Component.onCompleted: {
-        ui.submitTicket()
-    }
-
     ColumnLayout {
             anchors.fill: parent
             // spacing: 2
@@ -65,6 +61,16 @@ Item {
             onClicked: {
                 ui.submitPrint()
             }
+
+            // Component.onCompleted: {
+            //     ui.submitTicket()
+            // }
         }
+    }
+    Timer {
+        interval: 500
+        running: true
+        repeat: false
+        onTriggered: ui.submitTicket()
     }
 }

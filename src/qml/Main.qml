@@ -21,6 +21,10 @@ ApplicationWindow {
     Connections {
         target: ui
 
+        function onShowUserSignal() {
+            contentFrame.push(Qt.createComponent("User.qml"))
+        }
+
         function onShowEmailScreenSignal() {
             contentFrame.push(Qt.createComponent("Email.qml"))
         }

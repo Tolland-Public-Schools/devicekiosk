@@ -29,6 +29,7 @@ class UI(QObject):
     # Signals are special functions that allow a message to be sent from Python to QML UI
     # Instead of calling like a regular function, we call them as:
     # self.[signal].emit(argument)
+    showUserSignal = Signal(None)
     showEmailScreenSignal = Signal(None)
     startOverSignal = Signal(None)
     showDescriptionSignal = Signal(None)
@@ -41,7 +42,9 @@ class UI(QObject):
     showReturnSignal = Signal(None)
     showErrorSignal = Signal(str)
     
-
+    firstName = ""
+    lastName = ""
+    studentID = ""
     emailAddress = ""
     description = ""
     serialNumber = ""
@@ -73,9 +76,22 @@ class UI(QObject):
     def startOver(self):
         self.startOverSignal.emit()
 
-    @Slot('QString')
-    def submitEmail(self, address):
-        self.emailAddress = address
+    # @Slot('QString')
+    # def submitEmail(self, address):
+    #     self.emailAddress = address
+    #     if (self.serviceMode == Mode.dropoff):
+    #         self.showDescriptionSignal.emit()
+    #     else:
+    #         self.showDeviceSignal.emit()
+
+    @Slot(list)
+    def submitUser(self, userInfo):
+        print(userInfo)
+        self.firstName = userInfo[0]
+        self.lastName = userInfo[1]
+        self.studentID = userInfo[2]
+        self.emailAddress = self.firstName + self.lastName + self.studentID + "@tolland.k12.ct.us"
+        print("Student email is: " + self.emailAddress)
         if (self.serviceMode == Mode.dropoff):
             self.showDescriptionSignal.emit()
         else:
@@ -94,7 +110,7 @@ class UI(QObject):
         self.serviceMode = Mode(mode)
         print("Service mode: ")
         print(self.serviceMode)
-        self.showEmailScreenSignal.emit()
+        self.showUserSignal.emit()
 
     @Slot('QString')
     def submitDescription(self, description):
@@ -148,16 +164,15 @@ class UI(QObject):
             return
         with open(tokenPath, 'r') as file:
             self.zenDeskAPIToken = file.read()
+        self.postToZenDesk()
         
         
     def postToZenDesk(self):
         # New ticket info
-        subject = 'My printer is on fire!'
-        body = self.description
-        requester = ""
+        subject = self.firstName + " " + self.lastName + " Student Device Issue"
         # Package the data in a dictionary matching the expected JSON
-        # "requester": { "locale_id": 8, "name": "Pablo", "email": "pablito@example.org" }
-        data = {'ticket': {'subject': subject, 'comment': {'body': body}}}
+        # "custom_fields": [{"id": 1500007314361, "value": "student_device"}]
+        data = {'ticket': {'subject': subject, 'comment': {'body': self.description}, 'requester': {'name': self.firstName + " " + self.lastName, 'email': self.emailAddress}, 'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},{'id': 1500007314401, 'value':'ths'}]}}
         # Encode the data to create a JSON payload
         payload = json.dumps(data)
         # Set the request parameters
@@ -173,6 +188,7 @@ class UI(QObject):
             return
         # Report success
         print('Successfully created the ticket.')
+        self.enableNextSignal.emit()
                 
 
 if __name__ == "__main__":
