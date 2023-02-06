@@ -3,6 +3,8 @@ import os
 import datetime
 import requests
 import json
+import smtplib
+import yaml
 import tempfile
 import urllib.request
 import shutil
@@ -16,6 +18,7 @@ from PySide6.QtCore import QObject, Signal, Slot, Qt, QRunnable, QThread, QThrea
 from PySide6 import QtGui
 from pathlib import Path
 from enum import Enum
+from email.message import EmailMessage
 
 class Mode(Enum):
     dropoff = 1
@@ -41,6 +44,7 @@ class UI(QObject):
     showSubmitSignal = Signal(None)
     showReturnSignal = Signal(None)
     showErrorSignal = Signal(str)
+    showErrorPageSignal = Signal(None)
     
     firstName = ""
     lastName = ""
@@ -53,10 +57,13 @@ class UI(QObject):
     loanerDeviceBarcrod = ""
     serviceMode = Mode.dropoff
     schoolLogo = ""
-    zenDeskAPIToken = ""
-    
+    errorMessage = ""
+    config = None
 
-    print(serviceMode)
+    def loadConfig(self):
+        path = os.path.dirname(os.path.abspath(__file__))
+        configFile = os.path.join(path,'config.yml')
+        self.config = yaml.safe_load(open(configFile))
 
     # def toEmail(self):
     #     print("loading new qml")
@@ -157,17 +164,17 @@ class UI(QObject):
     @Slot()
     def submitTicket(self):
         print("submitting ticket")
-        path = os.path.dirname(os.path.abspath(__file__))
-        tokenPath = os.path.join(path,'apitoken.txt')
-        if (not os.path.exists(tokenPath)):
-            self.showErrorSignal.emit(tokenPath + " does not exist.")
-            return
-        with open(tokenPath, 'r') as file:
-            self.zenDeskAPIToken = file.read()
+        # TODO: Uncomment after testing
         self.postToZenDesk()
-        
+        if (not self.errorMessage == ""):
+            return
+        self.sendEmail()
+        if (not self.errorMessage == ""):
+            return
+        self.enableNextSignal.emit()
         
     def postToZenDesk(self):
+        self.errorMessage = ""
         # New ticket info
         subject = self.firstName + " " + self.lastName + " Student Device Issue"
         # Package the data in a dictionary matching the expected JSON
@@ -176,19 +183,45 @@ class UI(QObject):
         # Encode the data to create a JSON payload
         payload = json.dumps(data)
         # Set the request parameters
-        url = 'https://tollandpublicschools.zendesk.com/api/v2/tickets.json'
-        user = 'asher@tolland.k12.ct.us/token'
-        pwd = self.zenDeskAPIToken
+        url = "https://" + self.config["zendesk_domain"] + ".zendesk.com/api/v2/tickets.json"
+        user = self.config["zendesk_user"]
+        pwd = self.config["zendesk_token"]
         headers = {'content-type': 'application/json'}
         # Do the HTTP post request
         response = requests.post(url, data=payload, auth=(user, pwd), headers=headers)
         # Check for HTTP codes other than 201 (Created)
         if response.status_code != 201:
+            self.errorMessage = response.status_code
             self.showErrorSignal.emit('Error: ' + response.status_code)
+            self.showErrorPageSignal.emit()
             return
         # Report success
         print('Successfully created the ticket.')
-        self.enableNextSignal.emit()
+        
+
+    def sendEmail(self):
+        msg = EmailMessage()        
+        # me == the sender's email address
+        # you == the recipient's email address
+        if (self.serviceMode == Mode.dropoff):
+            msg['Subject'] = f'Student Device Drop Off: ' + self.firstName + ' ' + self.lastName
+            msg.set_content("test")
+        else:
+            msg['Subject'] = f'Student Device Pick Up: ' + self.firstName + ' ' + self.lastName
+            msg.set_content("test")
+        msg['From'] = self.config["smtp_user"]
+        msg['To'] = self.config["email_list"]
+
+        # Send the message via Gmail SMTP server
+        s = smtplib.SMTP("smtp.gmail.com", 587)
+        s.ehlo()
+        s.starttls()
+        s.login(self.config["smtp_user"], self.config["smtp_password"])
+        try:
+            s.send_message(msg)
+        except smtplib.SMTPException as ex:
+            self.errorMessage = ex
+        s.close()
                 
 
 if __name__ == "__main__":
@@ -197,6 +230,7 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)    
     # Instatitate objects
     ui = UI()
+    ui.loadConfig()
     
     engine = QQmlApplicationEngine()
     # Bind objects to the QML
