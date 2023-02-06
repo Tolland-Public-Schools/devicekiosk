@@ -50,7 +50,7 @@ ApplicationWindow {
             contentFrame.push(Qt.createComponent("Dropoff.qml"))
         }
 
-        function onShowLoanerSigna() {
+        function onShowLoanerSignal() {
             contentFrame.push(Qt.createComponent("Loaner.qml"))
         }
 
@@ -58,7 +58,7 @@ ApplicationWindow {
             contentFrame.push(Qt.createComponent("Submit.qml"))
         }
 
-        function onShowReturnSigna() {
+        function onShowReturnSignal() {
             contentFrame.push(Qt.createComponent("Return.qml"))
         }
     }

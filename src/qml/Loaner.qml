@@ -5,7 +5,7 @@ import QtQuick.Layouts
 
 Item {
 
-    function verifyEmail() {
+    function verifyForm() {
         if (inputSerial.text.toString().length >= 0) {        
             btnNext.enabled = true
         }
@@ -28,7 +28,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Take a device from the 'loaner' area. Use the barcode scanner to scan the barcode sticker on the loaner."
+            text: "Take a device from the 'loaner' area. If you need a laptop with class-specific apps (such as Creative Cloud or CAD), please take a loaner that indicates it has those apps installed. Use the barcode scanner to scan the barcode sticker on the loaner."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
@@ -44,7 +44,7 @@ Item {
             Layout.fillHeight: true
             focus: true
             onTextChanged: {
-                verifyEmail()
+                verifyForm()
             }
             
             Component.onCompleted: {

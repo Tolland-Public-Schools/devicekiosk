@@ -151,7 +151,7 @@ class UI(QObject):
 
     @Slot()
     def submitDropOff(self):
-        self.showSubmitSignal.emit()
+        self.showLoanerSignal.emit()
 
     @Slot('QString')
     def submitLoaner(self, serial):
@@ -177,9 +177,10 @@ class UI(QObject):
         self.errorMessage = ""
         # New ticket info
         subject = self.firstName + " " + self.lastName + " Student Device Issue"
+        body = self.description + "\nLoaner ID: " + self.loanerSerialNumber
         # Package the data in a dictionary matching the expected JSON
         # "custom_fields": [{"id": 1500007314361, "value": "student_device"}]
-        data = {'ticket': {'subject': subject, 'comment': {'body': self.description}, 'requester': {'name': self.firstName + " " + self.lastName, 'email': self.emailAddress}, 'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},{'id': 1500007314401, 'value':'ths'}]}}
+        data = {'ticket': {'subject': subject, 'comment': {'body': body}, 'requester': {'name': self.firstName + " " + self.lastName, 'email': self.emailAddress}, 'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},{'id': 1500007314401, 'value':'ths'},{'id': 1900003862405, 'value': self.serialNumber}]}}
         # Encode the data to create a JSON payload
         payload = json.dumps(data)
         # Set the request parameters
@@ -205,10 +206,12 @@ class UI(QObject):
         # you == the recipient's email address
         if (self.serviceMode == Mode.dropoff):
             msg['Subject'] = f'Student Device Drop Off: ' + self.firstName + ' ' + self.lastName
-            msg.set_content("test")
+            body = self.firstName + " " + self.lastName + " has dropped off a laptop for repair.\nStudent Number: " + self.studentID + "\nStudent Device Serial Number: " + self.serialNumber + "\nLoaner Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
         else:
             msg['Subject'] = f'Student Device Pick Up: ' + self.firstName + ' ' + self.lastName
-            msg.set_content("test")
+            body = self.firstName + " " + self.lastName + " has picked up a repaired laptop.\nStudent Number: " + self.studentID + "\nStudent Device Serial Number: " + self.serialNumber + "\nLoaner Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
         msg['From'] = self.config["smtp_user"]
         msg['To'] = self.config["email_list"]
 
