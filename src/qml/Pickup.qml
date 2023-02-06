@@ -28,7 +28,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Please use the barcode scanner to scan the barcode sticker on your device."
+            text: "Find the device in the 'Pickup' with the ticket with your name on it. Use the barcode scanner to scan the barcode sticker on your device."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
@@ -63,7 +63,6 @@ Item {
 
             onClicked: {
                 ui.submitSerial(inputSerial.text)
-                // ui.startOver()
             }
         }
     }

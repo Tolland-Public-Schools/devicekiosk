@@ -9,7 +9,7 @@ ApplicationWindow {
     // height: Constants.height
 
     visible: true
-    visibility: Window.FullScreen
+    // visibility: Window.FullScreen
     // visibility: Window.Maximized
     title: "Device Repair Kiosk"
 
@@ -58,8 +58,16 @@ ApplicationWindow {
             contentFrame.push(Qt.createComponent("Submit.qml"))
         }
 
+        function onShowSubmitPickupSignal() {
+            contentFrame.push(Qt.createComponent("SubmitPickup.qml"))
+        }
+
         function onShowReturnSignal() {
             contentFrame.push(Qt.createComponent("Return.qml"))
+        }
+
+        function onShowPickupSignal() {
+            contentFrame.push(Qt.createComponent("Pickup.qml"))
         }
 
         function onShowFinishSignal(error) {

@@ -4,6 +4,21 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
+
+    function verifyForm() {
+        if (inputSerial.text.toString().length > 0) {        
+            btnNext.enabled = true
+        }
+        else {
+            btnNext.enabled = false
+        }
+    }
+
+    function setFocus() {
+        inputSerial.focus = true
+        inputSerial.forceActiveFocus()
+    }
+
     ColumnLayout {
             anchors.fill: parent
             // spacing: 2
@@ -13,7 +28,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Please place your device in the 'Drop Off' area."
+            text: "Use the barcode scanner to scan the barcode sticker on the loaner.\nReturn your loaner to the 'Loaner' area. Be sure to plug it into power."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
@@ -21,35 +36,42 @@ Item {
 
         }
 
-        // TextField {
-        //     id: inputSerial
-        //     // placeholderText: qsTr("Email Address")
-        //     font.pointSize: 20
-        //     Layout.fillWidth: true
-        //     Layout.fillHeight: true
-        //     focus: true
-        //     onTextChanged: {
-        //         verifyEmail()
-        //     }
+        TextField {
+            id: inputSerial
+            // placeholderText: qsTr("Email Address")
+            font.pointSize: 20
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            focus: true
+            onTextChanged: {
+                verifyForm()
+            }
             
-        //     Component.onCompleted: {
-        //         console.log("inputEmail loaded")
-        //         this.focus = true
-        //         this.forceActiveFocus()
-        //     }
-        // }
+            Component.onCompleted: {
+                this.focus = true
+                this.forceActiveFocus()
+            }
+        }
 
             Button {
             id: btnNext
             text: "Next"
-            enabled: true
+            enabled: false
             font.pointSize: 50
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             onClicked: {
-                ui.submitDropOff()
+                ui.submitReturn(inputSerial.text)
             }
         }
+    }
+    // Setting focus any other way doesn't seem to work. 
+    // Kind of kludge, but works
+    Timer {
+        interval: 100
+        running: true
+        repeat: false
+        onTriggered: setFocus()
     }
 }

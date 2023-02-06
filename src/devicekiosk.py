@@ -42,7 +42,9 @@ class UI(QObject):
     enableNextSignal = Signal(None)
     showLoanerSignal = Signal(None)
     showSubmitSignal = Signal(None)
+    showSubmitPickupSignal = Signal(None)
     showReturnSignal = Signal(None)
+    showPickupSignal = Signal(None)
     showErrorSignal = Signal(str)
     showErrorPageSignal = Signal(None)
     showFinishSignal = Signal(None)
@@ -118,15 +120,15 @@ class UI(QObject):
         if (self.serviceMode == Mode.dropoff):
             self.showDescriptionSignal.emit()
         else:
-            self.showDeviceSignal.emit()
+            self.showReturnSignal.emit()
         
     @Slot('QString')
     def submitSerial(self, serial):
         self.serialNumber = serial        
         if (self.serviceMode == Mode.dropoff):
             self.showPrintSignal.emit()
-        # else:
-        #     self.printTicket()
+        else:
+            self.showSubmitPickupSignal.emit()
 
     @Slot('int')
     def start(self, mode):
@@ -171,10 +173,12 @@ class UI(QObject):
     @Slot('QString')
     def submitLoaner(self, serial):
         self.loanerSerialNumber = serial
-        if (self.serviceMode == Mode.dropoff):
-            self.showSubmitSignal.emit()
-        else:
-            self.showReturnSignal.emit()
+        self.showSubmitSignal.emit()
+    
+    @Slot('QString')
+    def submitReturn(self, serial):
+        self.loanerSerialNumber = serial
+        self.showPickupSignal.emit()
 
     # Submit the QML form from Submit.qml
     @Slot()
@@ -191,6 +195,11 @@ class UI(QObject):
         self.sendEmail()
         if (not self.errorMessage == ""):
             return
+        self.enableNextSignal.emit()
+    
+    @Slot()
+    def processPickup(self):
+        self.sendEmail()
         self.enableNextSignal.emit()
         
     def postToZenDesk(self):
@@ -219,7 +228,6 @@ class UI(QObject):
         # Report success
         print('Successfully created the ticket.')
         
-
     def sendEmail(self):
         msg = EmailMessage()        
         # me == the sender's email address
