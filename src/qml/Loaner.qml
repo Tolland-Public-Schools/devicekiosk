@@ -28,7 +28,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Use the barcode scanner to scan the barcode sticker on your device."
+            text: "Take a device from the 'loaner' area. Use the barcode scanner to scan the barcode sticker on the loaner."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
@@ -63,8 +63,7 @@ Item {
             Layout.fillHeight: true
 
             onClicked: {
-                ui.submitSerial(inputSerial.text)
-                // ui.startOver()
+                ui.submitLoaner(inputSerial.text)
             }
         }
     }

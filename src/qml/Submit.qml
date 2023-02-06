@@ -10,11 +10,6 @@ Item {
             btnNext.enabled = true
         }
     }
-
-    Component.onCompleted: {
-        ui.printTicket()
-    }
-
     ColumnLayout {
             anchors.fill: parent
             // spacing: 2
@@ -24,7 +19,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "A copy of your ticket is printing. Please tape it to your device."
+            text: "Please wait while your ticket is submitted."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
@@ -32,25 +27,9 @@ Item {
 
         }
 
-        // TextField {
-        //     id: inputSerial
-        //     // placeholderText: qsTr("Email Address")
-        //     font.pointSize: 20
-        //     Layout.fillWidth: true
-        //     Layout.fillHeight: true
-        //     focus: true
-        //     onTextChanged: {
-        //         verifyEmail()
-        //     }
-            
-        //     Component.onCompleted: {
-        //         console.log("inputEmail loaded")
-        //         this.focus = true
-        //         this.forceActiveFocus()
-        //     }
-        // }
+        
 
-            Button {
+        Button {
             id: btnNext
             text: "Next"
             enabled: false
@@ -63,10 +42,4 @@ Item {
             }
         }
     }
-    // Timer {
-    //     interval: 100
-    //     running: true
-    //     repeat: false
-    //     onTriggered: printTicket()
-    // }
 }

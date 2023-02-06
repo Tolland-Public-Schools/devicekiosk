@@ -45,6 +45,18 @@ ApplicationWindow {
         function onShowDropoffSignal() {
             contentFrame.push(Qt.createComponent("Dropoff.qml"))
         }
+
+        function onShowLoanerSigna() {
+            contentFrame.push(Qt.createComponent("Loaner.qml"))
+        }
+
+        function onShowSubmitSignal() {
+            contentFrame.push(Qt.createComponent("Submit.qml"))
+        }
+
+        function onShowReturnSigna() {
+            contentFrame.push(Qt.createComponent("Return.qml"))
+        }
     }
 
     // property var showedColon: false

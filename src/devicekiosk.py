@@ -35,11 +35,15 @@ class UI(QObject):
     showPrintSignal = Signal(None)
     showDropoffSignal = Signal(None)
     enableNextSignal = Signal(None)
+    showLoanerSignal = Signal(None)
+    showSubmitSignal = Signal(None)
+    showReturnSignal = Signal(None)
     
 
     emailAddress = ""
     description = ""
     serialNumber = ""
+    loanerSerialNumber = ""
     studentDeviceBarcode = ""
     loanerDeviceBarcrod = ""
     serviceMode = Mode.dropoff
@@ -76,9 +80,9 @@ class UI(QObject):
         
     @Slot('QString')
     def submitSerial(self, serial):
-        self.serialNumber = serial
+        self.serialNumber = serial        
         if (self.serviceMode == Mode.dropoff):
-            self.printTicket()
+            self.showPrintSignal.emit()
         # else:
         #     self.printTicket()
 
@@ -102,8 +106,8 @@ class UI(QObject):
         with open(logo, 'r') as file:
             self.schoolLogo = file.read()
     
-    def printTicket(self):
-        self.showPrintSignal.emit()
+    @Slot()
+    def printTicket(self):        
         self.loadSchoolLogo()
         date = datetime.datetime.now()
         ticket = self.schoolLogo + "\nEmail: " + self.emailAddress + "\nService Tag: " + self.serialNumber + "\nDate: " + date.strftime("%x") + "\nDescription: " + self.description
@@ -113,10 +117,27 @@ class UI(QObject):
         # lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
         # lpr.communicate(bytes(ticket, 'utf-8'))
         self.enableNextSignal.emit()
+        
+
+    @Slot()
+    def submitPrint(self):
+        self.showDropoffSignal.emit()
 
     @Slot()
     def submitDropOff(self):
-        self.showDropoffSignal.emit()
+        self.showSubmitSignal.emit()
+
+    @Slot('QString')
+    def submitLoaner(self, serial):
+        self.loanerSerialNumber = serial
+        if (self.serviceMode == Mode.dropoff):
+            self.showSubmitSignal.emit()
+        else:
+            self.showReturnSignal.emit()
+
+    @Slot()
+    def submitTicket():
+        print("submitting ticket")
         
 
 if __name__ == "__main__":
