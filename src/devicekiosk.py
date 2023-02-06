@@ -86,6 +86,17 @@ class UI(QObject):
 
     @Slot()
     def startOver(self):
+        self.firstName = ""
+        self.lastName = ""
+        self.studentID = ""
+        self.emailAddress = ""
+        self.description = ""
+        self.serialNumber = ""
+        self.loanerSerialNumber = ""
+        self.studentDeviceBarcode = ""
+        self.loanerDeviceBarcrod = ""
+        self.serviceMode = Mode.dropoff
+        self.errorMessage = ""
         self.startOverSignal.emit()
 
     # @Slot('QString')
@@ -138,8 +149,7 @@ class UI(QObject):
             self.schoolLogo = file.read()
     
     @Slot()
-    def printTicket(self):        
-        self.loadSchoolLogo()
+    def printTicket(self):
         date = datetime.datetime.now()
         ticket = self.schoolLogo + "\nEmail: " + self.emailAddress + "\nService Tag: " + self.serialNumber + "\nDate: " + date.strftime("%x") + "\nDescription: " + self.description
         ticket += "\n\n\n----- IT Use -----\n\n\nTicket Number: \n\n\n\n\n\nDate Completed:\n\n\n\n\n\nAdditional Information:"
@@ -244,6 +254,7 @@ if __name__ == "__main__":
     # Instatitate objects
     ui = UI()
     ui.loadConfig()
+    ui.loadSchoolLogo()
     
     engine = QQmlApplicationEngine()
     # Bind objects to the QML
