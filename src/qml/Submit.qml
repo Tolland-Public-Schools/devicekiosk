@@ -7,7 +7,7 @@ Item {
     Connections {
         target: ui
         function onEnableNextSignal() {
-            txtMessage.text = "Ticket sumbmitted, please tap 'Next'"
+            txtMessage.text = "Ticket sumbmitted, please tap 'Next'."
             btnNext.enabled = true
         }
     }

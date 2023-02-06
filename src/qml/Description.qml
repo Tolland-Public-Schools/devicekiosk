@@ -27,7 +27,7 @@ Item {
             id: txtDescription
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: "Please describe the problem then click 'Next'"
+            text: "Please describe the problem then tap 'Next'."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap

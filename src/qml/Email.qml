@@ -30,7 +30,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Please enter your email address below and tap 'Next'"
+            text: "Please enter your email address below and tap 'Next'."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap

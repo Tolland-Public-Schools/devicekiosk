@@ -32,7 +32,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Please enter your first name, last name, and student ID then click 'Next'"
+            text: "Please enter your first name, last name, and student ID then tap 'Next'."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
