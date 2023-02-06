@@ -237,7 +237,7 @@ class UI(QObject):
             msg.set_content(body)
         else:
             msg['Subject'] = f'Student Device Pick Up: ' + self.firstName + ' ' + self.lastName
-            body = self.firstName + " " + self.lastName + " has picked up a repaired laptop.\nStudent Number: " + self.studentID + "\nReturned loaner serial number: " + self.loanerSerialNumber + "\nPickup up student device serial number: " + self.serialNumber
+            body = self.firstName + " " + self.lastName + " has picked up a repaired laptop.\nStudent Number: " + self.studentID + "\nReturned loaner serial number: " + self.loanerSerialNumber + "\nPicked up student device serial number: " + self.serialNumber
             msg.set_content(body)
         msg['From'] = self.config["smtp_user"]
         msg['To'] = self.config["email_list"]
