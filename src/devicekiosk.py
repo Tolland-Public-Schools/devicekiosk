@@ -234,11 +234,11 @@ class UI(QObject):
         # you == the recipient's email address
         if (self.serviceMode == Mode.dropoff):
             msg['Subject'] = f'Student Device Drop Off: ' + self.firstName + ' ' + self.lastName
-            body = self.firstName + " " + self.lastName + " has dropped off a laptop for repair.\nStudent Number: " + self.studentID + "\nStudent Device Serial Number: " + self.serialNumber + "\nLoaner Serial Number: " + self.loanerSerialNumber
+            body = self.firstName + " " + self.lastName + " has dropped off a laptop for repair.\nStudent Number: " + self.studentID + "\nDropped off student device serial number: " + self.serialNumber + "\nLoaner Serial Number: " + self.loanerSerialNumber
             msg.set_content(body)
         else:
             msg['Subject'] = f'Student Device Pick Up: ' + self.firstName + ' ' + self.lastName
-            body = self.firstName + " " + self.lastName + " has picked up a repaired laptop.\nStudent Number: " + self.studentID + "\nStudent Device Serial Number: " + self.serialNumber + "\nLoaner Serial Number: " + self.loanerSerialNumber
+            body = self.firstName + " " + self.lastName + " has picked up a repaired laptop.\nStudent Number: " + self.studentID + "\nReturned loaner serial number: " + self.loanerSerialNumber + "\nPickup up student device serial number: " + self.serialNumber
             msg.set_content(body)
         msg['From'] = self.config["smtp_user"]
         msg['To'] = self.config["email_list"]
