@@ -96,6 +96,18 @@ Item {
                 // ui.startOver()
             }
         }
+        Button {
+            id: bntStartOver
+            text: "Start Over"
+            enabled: true
+            font.pointSize: 50
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            onClicked: {
+                ui.startOver()
+            }
+        }
     }
     // Setting focus any other way doesn't seem to work. 
     // Kind of kludge, but works

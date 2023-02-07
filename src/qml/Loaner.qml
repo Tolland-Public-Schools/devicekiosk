@@ -54,7 +54,7 @@ Item {
             }
         }
 
-            Button {
+        Button {
             id: btnNext
             text: "Next"
             enabled: false
@@ -64,6 +64,18 @@ Item {
 
             onClicked: {
                 ui.submitLoaner(inputSerial.text)
+            }
+        }
+        Button {
+            id: bntStartOver
+            text: "Start Over"
+            enabled: true
+            font.pointSize: 50
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            onClicked: {
+                ui.startOver()
             }
         }
     }
