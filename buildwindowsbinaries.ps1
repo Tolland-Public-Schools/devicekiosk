@@ -1,1 +1,1 @@
-pyinstaller -y .\src\clock.spec
+pyinstaller -y .\src\devicekiosk.spec
