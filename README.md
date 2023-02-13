@@ -5,9 +5,7 @@ Install pre-requisites:
 
 Qt 6.2.4 from https://www.qt.io/download-qt-installer
 
-pip install PySide6
-
-pip install pyinstaller
+pip install PySide6 pyinstaller pyyaml
 
 run with:
 
