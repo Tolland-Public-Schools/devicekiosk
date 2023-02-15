@@ -37,7 +37,7 @@ Item {
 
         Button {
             id: btnDropOff
-            text: "Dropping Off"
+            text: "Dropping Off for Repair"
             font.pointSize: 50
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -49,7 +49,7 @@ Item {
         }
         Button {
             id: btnPickUp
-            text: "Picking up"
+            text: "Picking Up Repaired Device"
             font.pointSize: 50
             Layout.fillWidth: true
             Layout.fillHeight: true
