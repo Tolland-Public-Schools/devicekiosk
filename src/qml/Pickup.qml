@@ -36,6 +36,13 @@ Item {
 
         }
 
+        AnimatedImage {
+            id: image
+            Layout.alignment: Qt.AlignHCenter
+            source: "../images/pickup.gif"
+            fillMode: Image.Image.PreserveAspectCrop
+        }
+
         TextField {
             id: inputSerial
             // placeholderText: qsTr("Email Address")
