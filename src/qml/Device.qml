@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
+import QtMultimedia
 
 Item {
 
@@ -36,6 +37,13 @@ Item {
 
         }
 
+        AnimatedImage {
+            id: image
+            Layout.alignment: Qt.AlignHCenter
+            source: "../images/device.gif"
+            fillMode: Image.Image.PreserveAspectCrop
+        }
+
         TextField {
             id: inputSerial
             // placeholderText: qsTr("Email Address")
@@ -51,7 +59,7 @@ Item {
                 this.focus = true
                 this.forceActiveFocus()
             }
-        }
+        }       
 
         Button {
             id: btnNext

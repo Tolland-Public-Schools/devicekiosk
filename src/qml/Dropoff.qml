@@ -21,23 +21,12 @@ Item {
 
         }
 
-        // TextField {
-        //     id: inputSerial
-        //     // placeholderText: qsTr("Email Address")
-        //     font.pointSize: 20
-        //     Layout.fillWidth: true
-        //     Layout.fillHeight: true
-        //     focus: true
-        //     onTextChanged: {
-        //         verifyEmail()
-        //     }
-            
-        //     Component.onCompleted: {
-        //         console.log("inputEmail loaded")
-        //         this.focus = true
-        //         this.forceActiveFocus()
-        //     }
-        // }
+        AnimatedImage {
+            id: image
+            Layout.alignment: Qt.AlignHCenter
+            source: "../images/dropoff.gif"
+            fillMode: Image.Image.PreserveAspectCrop
+        }
 
         Button {
             id: btnNext

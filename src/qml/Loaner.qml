@@ -36,6 +36,14 @@ Item {
 
         }
 
+        AnimatedImage {
+            id: image
+            Layout.alignment: Qt.AlignHCenter
+            source: "../images/loaner.gif"
+            fillMode: Image.Image.PreserveAspectCrop
+        }
+
+
         TextField {
             id: inputSerial
             // placeholderText: qsTr("Email Address")
@@ -54,6 +62,7 @@ Item {
             }
         }
 
+        
         Button {
             id: btnNext
             text: "Next"
