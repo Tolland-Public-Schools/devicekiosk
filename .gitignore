@@ -3,6 +3,10 @@ apitoken.txt
 src/apitoken.txt
 src/config.yml
 
+# IDEs
+.idea
+.vscode
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
