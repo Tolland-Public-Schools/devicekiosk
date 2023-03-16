@@ -2,6 +2,8 @@
 apitoken.txt
 src/apitoken.txt
 src/config.yml
+return-archive
+*.csv
 
 # IDEs
 .idea
