@@ -20,7 +20,12 @@ from pathlib import Path
 from enum import Enum
 from email.message import EmailMessage
 
-class Mode(Enum):
+class KioskMode(Enum):
+    normal = 0
+    singleUser = 1
+    eoyReturnOnly = 2
+
+class ServiceMode(Enum):
     dropoff = 1
     pickup = 2
 
@@ -48,6 +53,7 @@ class UI(QObject):
     showErrorSignal = Signal(str)
     showErrorPageSignal = Signal(None)
     showFinishSignal = Signal(None)
+    showEOYReturnSignal = Signal(None)
     
     firstName = ""
     lastName = ""
@@ -58,7 +64,7 @@ class UI(QObject):
     loanerSerialNumber = ""
     studentDeviceBarcode = ""
     loanerDeviceBarcrod = ""
-    serviceMode = Mode.dropoff
+    serviceMode = ServiceMode.dropoff
     schoolLogo = ""
     errorMessage = ""
     config = None
@@ -86,6 +92,10 @@ class UI(QObject):
     #     print("python showEmailScreen ran")
     #     self.showEmailScreenSignal.emit()
 
+    @Slot(None, result=int)
+    def getKioskMode(self):
+        return self.config["kiosk_mode"]
+
     @Slot()
     def startOver(self):
         self.firstName = ""
@@ -97,7 +107,7 @@ class UI(QObject):
         self.loanerSerialNumber = ""
         self.studentDeviceBarcode = ""
         self.loanerDeviceBarcrod = ""
-        self.serviceMode = Mode.dropoff
+        self.serviceMode = ServiceMode.dropoff
         self.errorMessage = ""
         self.startOverSignal.emit()
 
@@ -117,7 +127,7 @@ class UI(QObject):
         self.studentID = userInfo[2]
         self.emailAddress = self.firstName + self.lastName + self.studentID + "@tolland.k12.ct.us"
         print("Student email is: " + self.emailAddress)
-        if (self.serviceMode == Mode.dropoff):
+        if (self.serviceMode == ServiceMode.dropoff):
             self.showDescriptionSignal.emit()
         else:
             self.showReturnSignal.emit()
@@ -125,14 +135,14 @@ class UI(QObject):
     @Slot('QString')
     def submitSerial(self, serial):
         self.serialNumber = serial        
-        if (self.serviceMode == Mode.dropoff):
+        if (self.serviceMode == ServiceMode.dropoff):
             self.showPrintSignal.emit()
         else:
             self.showSubmitPickupSignal.emit()
 
     @Slot('int')
     def start(self, mode):
-        self.serviceMode = Mode(mode)
+        self.serviceMode = ServiceMode(mode)
         print("Service mode: ")
         print(self.serviceMode)
         self.showUserSignal.emit()
@@ -200,6 +210,12 @@ class UI(QObject):
     def processPickup(self):
         self.sendEmail()
         self.enableNextSignal.emit()
+
+    @Slot()
+    def submitEOYReturn(self):
+        print("end of year submitted")
+        self.showEOYReturnSignal.emit()
+
         
     def postToZenDesk(self):
         self.errorMessage = ""
@@ -231,7 +247,7 @@ class UI(QObject):
         msg = EmailMessage()        
         # me == the sender's email address
         # you == the recipient's email address
-        if (self.serviceMode == Mode.dropoff):
+        if (self.serviceMode == ServiceMode.dropoff):
             msg['Subject'] = f'Student Device Drop Off: ' + self.firstName + ' ' + self.lastName
             body = self.firstName + " " + self.lastName + " has dropped off a laptop for repair.\nStudent Number: " + self.studentID + "\nDropped off student device serial number: " + self.serialNumber + "\nLoaner Serial Number: " + self.loanerSerialNumber
             msg.set_content(body)
