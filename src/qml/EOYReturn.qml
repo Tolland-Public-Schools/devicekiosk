@@ -38,12 +38,6 @@ Item {
         btnChargerNoText.color = "white"
         btnChargerNoRect.color = "red"
     }
-
-    function listProperty(item)
-    {
-        for (var p in item)
-        console.log(p + ": " + item[p]);
-    }
     
     ColumnLayout {
             anchors.fill: parent
@@ -165,9 +159,7 @@ Item {
                     }
                 }
             }       
-        }
-
-        
+        }        
 
         Button {
             id: btnSubmit
@@ -180,6 +172,19 @@ Item {
             onClicked: {
                 var returnInfo = [inputSerial.text, chargerReturned]
                 ui.submitEOYReturn(returnInfo)
+            }
+        }
+
+        Button {
+            id: btnMenu
+            text: "Return to EOY Menu"
+            enabled: true
+            font.pointSize: 20
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            onClicked: {
+                contentFrame.push(Qt.createComponent("EOYStart.qml"))
             }
         }
         

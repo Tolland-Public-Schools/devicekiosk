@@ -11,6 +11,7 @@ import shutil
 import zipfile
 import traceback
 import subprocess
+import uuid
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
@@ -54,6 +55,7 @@ class UI(QObject):
     showErrorPageSignal = Signal(None)
     showFinishSignal = Signal(None)
     showEOYReturnSignal = Signal(None)
+    showEOYStartSignal = Signal(None)
     
     firstName = ""
     lastName = ""
@@ -220,6 +222,11 @@ class UI(QObject):
         self.addToReturnFile(returnSerial, chargerReturned)
         self.showEOYReturnSignal.emit()
 
+    @Slot('QString')
+    def submitEOYFinish(self, returnEmail):
+        self.emailEOYReturnFiles(returnEmail)
+        self.archiveReturns()
+        self.showEOYStartSignal.emit()
         
     def postToZenDesk(self):
         self.errorMessage = ""
@@ -273,6 +280,34 @@ class UI(QObject):
             self.errorMessage = ex
         s.close()
 
+    def emailEOYReturnFiles(self, returnAddress):
+        msg = EmailMessage()
+        msg['Subject'] = 'EOY Return Files'
+        body = "EOY Return Files"
+        msg.set_content(body)
+        attachmentFolder = os.path.dirname(os.path.abspath(__file__))
+        # files = 
+        for file in os.listdir(attachmentFolder):
+            if file.endswith(".csv"):
+                with open(os.path.join(attachmentFolder, file), 'rb') as content_file:
+                    print(file)
+                    content = content_file.read()
+                    msg.add_attachment(content, maintype='application', subtype='txt', filename=str(file))
+        # email.add_attachment(content, maintype='application', subtype='pdf', filename='example.pdf')
+        msg['From'] = self.config["smtp_user"]
+        msg['To'] = "asher@tolland.k12.ct.us, " + returnAddress
+        # Send the message via Gmail SMTP server
+        s = smtplib.SMTP("smtp.gmail.com", 587)
+        s.ehlo()
+        s.starttls()
+        s.login(self.config["smtp_user"], self.config["smtp_password"])
+        try:
+            s.send_message(msg)
+        except smtplib.SMTPException as ex:
+            self.errorMessage = ex
+            print("Email error " + ex)
+        s.close()
+
     def addToReturnFile(self, serial, returnedCharger):
         print("Adding " + serial + " to return file, with charger: " + str(returnedCharger))
         filename = "eoy-returns-" + str(datetime.date.today()) + ".csv"
@@ -287,7 +322,15 @@ class UI(QObject):
             with open(returnsFile, 'a') as f:
                 f.writelines(serial + "," + str(returnedCharger) + "\n")
                 f.close()
-                
+
+    def archiveReturns(self):
+        workingDir = os.path.dirname(os.path.abspath(__file__))
+        archiveDir = os.path.join(workingDir, "return-archive", str(uuid.uuid4()))
+        if not os.path.exists(archiveDir):
+            os.makedirs(archiveDir)
+        for file in os.listdir(workingDir):
+            if file.endswith(".csv"):
+                shutil.move(os.path.join(workingDir, file), archiveDir)
 
 if __name__ == "__main__":
     QGuiApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True) #enable highdpi scaling

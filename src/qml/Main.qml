@@ -77,7 +77,12 @@ ApplicationWindow {
         function onShowEOYReturnSignal() {
             // contentFrame.clear()
             contentFrame.push(Qt.createComponent("EOYReturn.qml"))
-        }        
+        }
+
+        function onShowEOYStartSignal() {
+            // contentFrame.clear()
+            contentFrame.push(Qt.createComponent("EOYStart.qml"))
+        }
     }
 
     // Automatically go to a non-standard kiosk mode start page
@@ -90,7 +95,7 @@ ApplicationWindow {
                 break;
             case 2:
                 // EOY Return Only Mode
-                contentFrame.push(Qt.createComponent("EOYReturn.qml"))
+                contentFrame.push(Qt.createComponent("EOYStart.qml"))
             default:
                 break;
         }
