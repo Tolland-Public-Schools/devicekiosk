@@ -211,9 +211,13 @@ class UI(QObject):
         self.sendEmail()
         self.enableNextSignal.emit()
 
-    @Slot()
-    def submitEOYReturn(self):
+    @Slot(list)
+    def submitEOYReturn(self, returnInfo):
+        returnSerial = returnInfo[0]
+        chargerReturned = returnInfo[1]
+
         print("end of year submitted")
+        self.addToReturnFile(returnSerial, chargerReturned)
         self.showEOYReturnSignal.emit()
 
         
@@ -268,6 +272,21 @@ class UI(QObject):
         except smtplib.SMTPException as ex:
             self.errorMessage = ex
         s.close()
+
+    def addToReturnFile(self, serial, returnedCharger):
+        print("Adding " + serial + " to return file, with charger: " + str(returnedCharger))
+        filename = "eoy-returns-" + str(datetime.date.today()) + ".csv"
+        returnsFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),filename)
+        if not os.path.exists(returnsFile):
+            with open(returnsFile, 'a') as f:
+                f.writelines("Serial, Charger\n")
+                f.writelines(serial + "," + str(returnedCharger) + "\n")
+                f.close()
+        else: 
+            # Populate version.txt with the newly installed build
+            with open(returnsFile, 'a') as f:
+                f.writelines(serial + "," + str(returnedCharger) + "\n")
+                f.close()
                 
 
 if __name__ == "__main__":

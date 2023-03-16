@@ -178,7 +178,8 @@ Item {
             Layout.fillHeight: true
 
             onClicked: {
-                ui.submitEOYReturn()
+                var returnInfo = [inputSerial.text, chargerReturned]
+                ui.submitEOYReturn(returnInfo)
             }
         }
         
