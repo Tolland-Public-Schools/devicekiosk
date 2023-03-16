@@ -32,7 +32,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Enter an email address to receive the return files.\nEmail will also be sent to Candace de Loureiro.\nFiles will be backed up this computer in the event something goes wrong."
+            text: "Enter an email address to receive the return files.\nEmail will also be sent to: " + ui.getEOYEmailAddresses() + "\nFiles will be backed up this computer in the event something goes wrong."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap

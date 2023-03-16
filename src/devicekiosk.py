@@ -97,6 +97,10 @@ class UI(QObject):
     @Slot(None, result=int)
     def getKioskMode(self):
         return self.config["kiosk_mode"]
+    
+    @Slot(None, result=str)
+    def getEOYEmailAddresses(self):
+        return self.config["eoy_return_addresses"]
 
     @Slot()
     def startOver(self):
@@ -295,7 +299,7 @@ class UI(QObject):
                     msg.add_attachment(content, maintype='application', subtype='txt', filename=str(file))
         # email.add_attachment(content, maintype='application', subtype='pdf', filename='example.pdf')
         msg['From'] = self.config["smtp_user"]
-        msg['To'] = "asher@tolland.k12.ct.us, " + returnAddress
+        msg['To'] = self.config["eoy_return_addresses"] + ", " + returnAddress
         # Send the message via Gmail SMTP server
         s = smtplib.SMTP("smtp.gmail.com", 587)
         s.ehlo()
