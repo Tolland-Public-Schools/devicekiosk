@@ -11,6 +11,7 @@ import shutil
 import zipfile
 import traceback
 import subprocess
+import uuid
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
@@ -20,7 +21,12 @@ from pathlib import Path
 from enum import Enum
 from email.message import EmailMessage
 
-class Mode(Enum):
+class KioskMode(Enum):
+    normal = 0
+    singleUser = 1
+    eoyReturnOnly = 2
+
+class ServiceMode(Enum):
     dropoff = 1
     pickup = 2
 
@@ -48,6 +54,8 @@ class UI(QObject):
     showErrorSignal = Signal(str)
     showErrorPageSignal = Signal(None)
     showFinishSignal = Signal(None)
+    showEOYReturnSignal = Signal(None)
+    showEOYStartSignal = Signal(None)
     
     firstName = ""
     lastName = ""
@@ -58,7 +66,7 @@ class UI(QObject):
     loanerSerialNumber = ""
     studentDeviceBarcode = ""
     loanerDeviceBarcrod = ""
-    serviceMode = Mode.dropoff
+    serviceMode = ServiceMode.dropoff
     schoolLogo = ""
     errorMessage = ""
     config = None
@@ -86,6 +94,10 @@ class UI(QObject):
     #     print("python showEmailScreen ran")
     #     self.showEmailScreenSignal.emit()
 
+    @Slot(None, result=int)
+    def getKioskMode(self):
+        return self.config["kiosk_mode"]
+
     @Slot()
     def startOver(self):
         self.firstName = ""
@@ -97,7 +109,7 @@ class UI(QObject):
         self.loanerSerialNumber = ""
         self.studentDeviceBarcode = ""
         self.loanerDeviceBarcrod = ""
-        self.serviceMode = Mode.dropoff
+        self.serviceMode = ServiceMode.dropoff
         self.errorMessage = ""
         self.startOverSignal.emit()
 
@@ -117,7 +129,7 @@ class UI(QObject):
         self.studentID = userInfo[2]
         self.emailAddress = self.firstName + self.lastName + self.studentID + "@tolland.k12.ct.us"
         print("Student email is: " + self.emailAddress)
-        if (self.serviceMode == Mode.dropoff):
+        if (self.serviceMode == ServiceMode.dropoff):
             self.showDescriptionSignal.emit()
         else:
             self.showReturnSignal.emit()
@@ -125,14 +137,14 @@ class UI(QObject):
     @Slot('QString')
     def submitSerial(self, serial):
         self.serialNumber = serial        
-        if (self.serviceMode == Mode.dropoff):
+        if (self.serviceMode == ServiceMode.dropoff):
             self.showPrintSignal.emit()
         else:
             self.showSubmitPickupSignal.emit()
 
     @Slot('int')
     def start(self, mode):
-        self.serviceMode = Mode(mode)
+        self.serviceMode = ServiceMode(mode)
         print("Service mode: ")
         print(self.serviceMode)
         self.showUserSignal.emit()
@@ -200,6 +212,21 @@ class UI(QObject):
     def processPickup(self):
         self.sendEmail()
         self.enableNextSignal.emit()
+
+    @Slot(list)
+    def submitEOYReturn(self, returnInfo):
+        returnSerial = returnInfo[0]
+        chargerReturned = returnInfo[1]
+
+        print("end of year submitted")
+        self.addToReturnFile(returnSerial, chargerReturned)
+        self.showEOYReturnSignal.emit()
+
+    @Slot('QString')
+    def submitEOYFinish(self, returnEmail):
+        self.emailEOYReturnFiles(returnEmail)
+        self.archiveReturns()
+        self.showEOYStartSignal.emit()
         
     def postToZenDesk(self):
         self.errorMessage = ""
@@ -231,7 +258,7 @@ class UI(QObject):
         msg = EmailMessage()        
         # me == the sender's email address
         # you == the recipient's email address
-        if (self.serviceMode == Mode.dropoff):
+        if (self.serviceMode == ServiceMode.dropoff):
             msg['Subject'] = f'Student Device Drop Off: ' + self.firstName + ' ' + self.lastName
             body = self.firstName + " " + self.lastName + " has dropped off a laptop for repair.\nStudent Number: " + self.studentID + "\nDropped off student device serial number: " + self.serialNumber + "\nLoaner Serial Number: " + self.loanerSerialNumber
             msg.set_content(body)
@@ -252,7 +279,58 @@ class UI(QObject):
         except smtplib.SMTPException as ex:
             self.errorMessage = ex
         s.close()
-                
+
+    def emailEOYReturnFiles(self, returnAddress):
+        msg = EmailMessage()
+        msg['Subject'] = 'EOY Return Files'
+        body = "EOY Return Files"
+        msg.set_content(body)
+        attachmentFolder = os.path.dirname(os.path.abspath(__file__))
+        # files = 
+        for file in os.listdir(attachmentFolder):
+            if file.endswith(".csv"):
+                with open(os.path.join(attachmentFolder, file), 'rb') as content_file:
+                    print(file)
+                    content = content_file.read()
+                    msg.add_attachment(content, maintype='application', subtype='txt', filename=str(file))
+        # email.add_attachment(content, maintype='application', subtype='pdf', filename='example.pdf')
+        msg['From'] = self.config["smtp_user"]
+        msg['To'] = "asher@tolland.k12.ct.us, " + returnAddress
+        # Send the message via Gmail SMTP server
+        s = smtplib.SMTP("smtp.gmail.com", 587)
+        s.ehlo()
+        s.starttls()
+        s.login(self.config["smtp_user"], self.config["smtp_password"])
+        try:
+            s.send_message(msg)
+        except smtplib.SMTPException as ex:
+            self.errorMessage = ex
+            print("Email error " + ex)
+        s.close()
+
+    def addToReturnFile(self, serial, returnedCharger):
+        print("Adding " + serial + " to return file, with charger: " + str(returnedCharger))
+        filename = "eoy-returns-" + str(datetime.date.today()) + ".csv"
+        returnsFile = os.path.join(os.path.dirname(os.path.abspath(__file__)),filename)
+        if not os.path.exists(returnsFile):
+            with open(returnsFile, 'a') as f:
+                f.writelines("Serial, Charger\n")
+                f.writelines(serial + "," + str(returnedCharger) + "\n")
+                f.close()
+        else: 
+            # Populate version.txt with the newly installed build
+            with open(returnsFile, 'a') as f:
+                f.writelines(serial + "," + str(returnedCharger) + "\n")
+                f.close()
+
+    def archiveReturns(self):
+        workingDir = os.path.dirname(os.path.abspath(__file__))
+        archiveDir = os.path.join(workingDir, "return-archive", str(uuid.uuid4()))
+        if not os.path.exists(archiveDir):
+            os.makedirs(archiveDir)
+        for file in os.listdir(workingDir):
+            if file.endswith(".csv"):
+                shutil.move(os.path.join(workingDir, file), archiveDir)
 
 if __name__ == "__main__":
     QGuiApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True) #enable highdpi scaling

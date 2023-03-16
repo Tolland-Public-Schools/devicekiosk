@@ -73,7 +73,33 @@ ApplicationWindow {
         function onShowFinishSignal(error) {
             contentFrame.push(Qt.createComponent("Finish.qml"))
         }
+
+        function onShowEOYReturnSignal() {
+            // contentFrame.clear()
+            contentFrame.push(Qt.createComponent("EOYReturn.qml"))
+        }
+
+        function onShowEOYStartSignal() {
+            // contentFrame.clear()
+            contentFrame.push(Qt.createComponent("EOYStart.qml"))
+        }
     }
+
+    // Automatically go to a non-standard kiosk mode start page
+    function setInitialPage() {
+        switch(ui.getKioskMode()) {
+            case 0:
+                break;
+            case 1:
+                // TODO
+                break;
+            case 2:
+                // EOY Return Only Mode
+                contentFrame.push(Qt.createComponent("EOYStart.qml"))
+            default:
+                break;
+        }
+    }    
 
     // property var showedColon: false
 
@@ -88,6 +114,9 @@ ApplicationWindow {
         height: appWindow.height
         id: contentFrame
         initialItem: Qt.createComponent("Start.qml")
+        Component.onCompleted: {
+            setInitialPage()
+        }
     }
 
 
