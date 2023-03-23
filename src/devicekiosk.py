@@ -64,8 +64,8 @@ class UI(QObject):
     description = ""
     serialNumber = ""
     loanerSerialNumber = ""
-    studentDeviceBarcode = ""
-    loanerDeviceBarcrod = ""
+    # studentDeviceBarcode = ""
+    # loanerDeviceBarcode = ""
     serviceMode = ServiceMode.dropoff
     schoolLogo = ""
     errorMessage = ""
@@ -111,8 +111,8 @@ class UI(QObject):
         self.description = ""
         self.serialNumber = ""
         self.loanerSerialNumber = ""
-        self.studentDeviceBarcode = ""
-        self.loanerDeviceBarcrod = ""
+        # self.studentDeviceBarcode = ""
+        # self.loanerDeviceBarcode = ""
         self.serviceMode = ServiceMode.dropoff
         self.errorMessage = ""
         self.startOverSignal.emit()
@@ -128,9 +128,13 @@ class UI(QObject):
     @Slot(list)
     def submitUser(self, userInfo):
         print(userInfo)
-        self.firstName = userInfo[0]
-        self.lastName = userInfo[1]
+        self.firstName = userInfo[0]        
+        self.lastName = userInfo[1]        
         self.studentID = userInfo[2]
+        # Strip spaces. Some users were putting spaces after their first and last name
+        self.firstName = self.firstName.replace(" ", "")
+        self.lastName = self.lastName.replace(" ", "")
+        self.studentID = self.studentID.replace(" ", "")
         self.emailAddress = self.firstName + self.lastName + self.studentID + "@tolland.k12.ct.us"
         print("Student email is: " + self.emailAddress)
         if (self.serviceMode == ServiceMode.dropoff):
@@ -140,7 +144,8 @@ class UI(QObject):
         
     @Slot('QString')
     def submitSerial(self, serial):
-        self.serialNumber = serial        
+        self.serialNumber = serial
+        self.serialNumber = self.serialNumber.replace(" ", "")      
         if (self.serviceMode == ServiceMode.dropoff):
             self.showPrintSignal.emit()
         else:
@@ -188,11 +193,15 @@ class UI(QObject):
     @Slot('QString')
     def submitLoaner(self, serial):
         self.loanerSerialNumber = serial
+        # Remove superflous spaces
+        self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
         self.showSubmitSignal.emit()
     
     @Slot('QString')
     def submitReturn(self, serial):
         self.loanerSerialNumber = serial
+        # Remove superflous spaces
+        self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
         self.showPickupSignal.emit()
 
     # Submit the QML form from Submit.qml
@@ -252,7 +261,7 @@ class UI(QObject):
         # Check for HTTP codes other than 201 (Created)
         if response.status_code != 201:
             self.errorMessage = response.status_code
-            self.showErrorSignal.emit('Error: ' + response.status_code)
+            self.showErrorSignal.emit('Error: ' + str(response.status_code))
             self.showErrorPageSignal.emit()
             return
         # Report success
