@@ -8,7 +8,9 @@ Item {
         target: ui
         function onShowDailyLoanersSignal() {
             btnDailyDeviceLoaner.visible = true;
+            btnDailyDeviceLoanerReturn.visible = true;
             btnDailyCharger.visible = true;
+            btnDailyChargerReturn.visible = true;
         }
     }
     
@@ -48,33 +50,66 @@ Item {
             fillMode: Image.PreserveAspectFit
         }
 
-        Button {
-            id: btnDailyDeviceLoaner
-            text: "Borrowing a laptop for the day"
-            font.pointSize: 50
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            visible: false
-            onClicked: {
-                // ui.toEmail()
-                // contentFrame.push(Qt.createComponent("Email.qml"))
-                ui.start(2)
+        RowLayout {
+            Button {
+                id: btnDailyDeviceLoaner
+                text: "Borrowing a laptop for the day"
+                font.pointSize: 50
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: false
+                onClicked: {
+                    // ui.toEmail()
+                    // contentFrame.push(Qt.createComponent("Email.qml"))
+                    ui.start(3)
+                }
             }
+            Button {
+                id: btnDailyDeviceLoanerReturn
+                text: "Returning a daily laptop"
+                font.pointSize: 50
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: false
+                onClicked: {
+                    // ui.toEmail()
+                    // contentFrame.push(Qt.createComponent("Email.qml"))
+                    ui.start(5)
+                }
+            }        
         }
 
-        Button {
-            id: btnDailyCharger
-            text: "Borrowing a charger for the day"
-            font.pointSize: 50
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            visible: false
-            onClicked: {
-                // ui.toEmail()
-                // contentFrame.push(Qt.createComponent("Email.qml"))
-                ui.start(2)
+        RowLayout {
+            Button {
+                id: btnDailyCharger
+                text: "Borrowing a charger for the day"
+                font.pointSize: 50
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: false
+                onClicked: {
+                    // ui.toEmail()
+                    // contentFrame.push(Qt.createComponent("Email.qml"))
+                    ui.start(4)
+                }
             }
+            Button {
+                id: btnDailyChargerReturn
+                text: "Returning a daily charger"
+                font.pointSize: 50
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                visible: false
+                onClicked: {
+                    // ui.toEmail()
+                    // contentFrame.push(Qt.createComponent("Email.qml"))
+                    ui.start(6)
+                }
+            }      
         }
+        
+
+        
 
         Button {
             id: btnDropOff

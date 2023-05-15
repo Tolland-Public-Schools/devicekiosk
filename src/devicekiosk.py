@@ -29,8 +29,10 @@ class KioskMode(Enum):
 class ServiceMode(Enum):
     dropoff = 1
     pickup = 2
-    dailyDevice = 3
-    dailyCharger = 4
+    dailyDeviceBorrow = 3
+    dailyChargerBorrow = 4
+    dailyDeviceReturn = 5
+    dailyChargerReturn = 6
 
 class UI(QObject):
     majorVersion = 1
@@ -59,6 +61,10 @@ class UI(QObject):
     showFinishSignal = Signal(None)
     showEOYReturnSignal = Signal(None)
     showEOYStartSignal = Signal(None)
+    showDailyLoanerDeviceScreenSignal = Signal(None)
+    showDailyLoanerChargerScreenSignal = Signal(None)
+    showFinishDailyBorrowSignal = Signal(None)
+    showFinishDailyReturnSignal = Signal(None)
     
     firstName = ""
     lastName = ""
@@ -149,8 +155,15 @@ class UI(QObject):
         self.studentID = self.studentID.replace(" ", "")
         self.emailAddress = self.firstName + self.lastName + self.studentID + "@tolland.k12.ct.us"
         print("Student email is: " + self.emailAddress)
+        print("Service mode is: " + str(self.serviceMode))
         if (self.serviceMode == ServiceMode.dropoff):
             self.showDescriptionSignal.emit()
+        elif (self.serviceMode == ServiceMode.dailyDeviceBorrow):
+            print("Python daily device mode")
+            self.showDailyLoanerDeviceScreenSignal.emit()
+        elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
+            print("Python daily charger mode")
+            self.showDailyLoanerChargerScreenSignal.emit()
         else:
             self.showReturnSignal.emit()
         
@@ -207,14 +220,41 @@ class UI(QObject):
         self.loanerSerialNumber = serial
         # Remove superflous spaces
         self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
-        self.showSubmitSignal.emit()
+        if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
+            self.sendDailyDeviceBorrowEmail()
+        elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
+            self.sendDailyChargerBorrowEmail()
+        else:
+            self.showSubmitSignal.emit()
+
+    def sendDailyDeviceBorrowEmail(self):
+        print("Sending daily device email")
+        self.showFinishDailyBorrowSignal.emit()
+
+    def sendDailyChargerBorrowEmail(self):
+        print("Sending daily charger email")
+        self.showFinishDailyBorrowSignal.emit()
     
     @Slot('QString')
     def submitReturn(self, serial):
         self.loanerSerialNumber = serial
         # Remove superflous spaces
         self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
-        self.showPickupSignal.emit()
+        if (self.serviceMode == ServiceMode.pickup):
+            self.showPickupSignal.emit()
+        elif(self.serviceMode == ServiceMode.dailyDeviceReturn):
+            self.returnDailyLoaner()
+        elif(self.serviceMode == ServiceMode.dailyChargerReturn):
+            self.returnDailyCharger()
+
+    def returnDailyLoaner(self):
+        print("python: returning daily loaner")
+        self.startOver()
+    
+    def returnDailyCharger(self):
+        print("python: returning daily charger")
+        self.startOver()
+
 
     # Submit the QML form from Submit.qml
     @Slot()
