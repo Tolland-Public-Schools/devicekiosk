@@ -6,6 +6,25 @@ import QtQuick.Layouts
 Item {
     Connections {
         target: ui
+        function onEnableNextSignal() {
+            btnNext.enabled = true
+        }
+
+        // function onShowErrorSignal(error) {
+        //     txtError.enabled = true
+        //     txtError.text = "Error: " + error
+        //     // console.log(error)
+        // }
+
+        function onShowErrorSignal(error) {
+            console.log("Error: " + error)
+            if (error != "") {
+                txtMessage.text = "There was an error creating your ticket."
+                txtError.enabled = true
+                txtError.text = "Error: " + error
+                btnNext.text = "Start Over"
+            }            
+        }
     }
     
     ColumnLayout {
@@ -50,6 +69,10 @@ Item {
             onClicked: {
                 ui.startOver()
             }
+        }
+        
+        Component.onCompleted: {
+            ui.checkForErrors()
         }
     }
 }
