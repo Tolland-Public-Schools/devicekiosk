@@ -29,6 +29,8 @@ class KioskMode(Enum):
 class ServiceMode(Enum):
     dropoff = 1
     pickup = 2
+    dailyDevice = 3
+    dailyCharger = 4
 
 class UI(QObject):
     majorVersion = 1
@@ -38,6 +40,7 @@ class UI(QObject):
     # Signals are special functions that allow a message to be sent from Python to QML UI
     # Instead of calling like a regular function, we call them as:
     # self.[signal].emit(argument)
+    showDailyLoanersSignal = Signal(None)
     showUserSignal = Signal(None)
     showEmailScreenSignal = Signal(None)
     startOverSignal = Signal(None)
@@ -75,6 +78,7 @@ class UI(QObject):
         path = os.path.dirname(os.path.abspath(__file__))
         configFile = os.path.join(path,'config.yml')
         self.config = yaml.safe_load(open(configFile))
+        print("devicekiosk.py daily loaner status: " + str(self.config["show_daily_loaner"]))
 
     # def toEmail(self):
     #     print("loading new qml")
@@ -124,6 +128,14 @@ class UI(QObject):
     #         self.showDescriptionSignal.emit()
     #     else:
     #         self.showDeviceSignal.emit()
+
+    @Slot()
+    def showHideDailyLoaners(self):
+        if (self.config["show_daily_loaner"] == True):
+            print("showing daily loaners")
+            self.showDailyLoanersSignal.emit()
+        else:
+            print("keeping daily loaners hidden")
 
     @Slot(list)
     def submitUser(self, userInfo):

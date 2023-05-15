@@ -4,6 +4,19 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
+    Connections {
+        target: ui
+        function onShowDailyLoanersSignal() {
+            btnDailyDeviceLoaner.visible = true;
+            btnDailyCharger.visible = true;
+        }
+    }
+    
+    function showHideDailyLoaners() {
+        ui.showHideDailyLoaners()
+    }
+
+
     ColumnLayout {
         anchors.fill: parent
         // spacing: 2
@@ -36,6 +49,34 @@ Item {
         }
 
         Button {
+            id: btnDailyDeviceLoaner
+            text: "Borrowing a laptop for the day"
+            font.pointSize: 50
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            visible: false
+            onClicked: {
+                // ui.toEmail()
+                // contentFrame.push(Qt.createComponent("Email.qml"))
+                ui.start(2)
+            }
+        }
+
+        Button {
+            id: btnDailyCharger
+            text: "Borrowing a charger for the day"
+            font.pointSize: 50
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            visible: false
+            onClicked: {
+                // ui.toEmail()
+                // contentFrame.push(Qt.createComponent("Email.qml"))
+                ui.start(2)
+            }
+        }
+
+        Button {
             id: btnDropOff
             text: "Dropping Off for Repair"
             font.pointSize: 50
@@ -59,5 +100,13 @@ Item {
                 ui.start(2)
             }
         }
+    }
+    // Setting focus any other way doesn't seem to work. 
+    // Kind of kludge, but works
+    Timer {
+        interval: 100
+        running: true
+        repeat: false
+        onTriggered: showHideDailyLoaners()
     }
 }
