@@ -221,19 +221,45 @@ class UI(QObject):
         # Remove superflous spaces
         self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
         if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
-            self.sendDailyDeviceBorrowEmail()
+            self.sendDailyEmail()
+            self.showFinishDailyBorrowSignal.emit()
         elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
-            self.sendDailyChargerBorrowEmail()
+            self.sendDailyEmail()
+            self.showFinishDailyBorrowSignal.emit()
         else:
             self.showSubmitSignal.emit()
 
-    def sendDailyDeviceBorrowEmail(self):
-        print("Sending daily device email")
-        self.showFinishDailyBorrowSignal.emit()
+    def sendDailyEmail(self):
+        msg = EmailMessage() 
+        if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
+            msg['Subject'] = f'Daily loaner device borrowed by: ' + self.firstName + ' ' + self.lastName
+            body = self.firstName + " " + self.lastName + " has borrowed a daily loaner device.\nStudent Number: " + self.studentID + "\nLoaner Device Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
+        elif (self.serviceMode == ServiceMode.dailyDeviceReturn):
+            msg['Subject'] = f'Daily loaner device returned by: ' + self.firstName + ' ' + self.lastName
+            body = self.firstName + " " + self.lastName + " has returned a daily loaner device.\nStudent Number: " + self.studentID + "\nLoaner Device Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
+        elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
+            msg['Subject'] = f'Daily loaner charger borrowed by: ' + self.firstName + ' ' + self.lastName
+            body = self.firstName + " " + self.lastName + " has borrowed a daily loaner charger.\nStudent Number: " + self.studentID + "\nLoaner Charger Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
+        elif (self.serviceMode == ServiceMode.dailyChargerReturn):
+            msg['Subject'] = f'Daily loaner charger returned by: ' + self.firstName + ' ' + self.lastName
+            body = self.firstName + " " + self.lastName + " has returned a daily loaner charger.\nStudent Number: " + self.studentID + "\nLoaner Charger Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
+        msg['From'] = self.config["smtp_user"]
+        msg['To'] = self.config["daily_email_list"]
 
-    def sendDailyChargerBorrowEmail(self):
-        print("Sending daily charger email")
-        self.showFinishDailyBorrowSignal.emit()
+        # Send the message via Gmail SMTP server
+        s = smtplib.SMTP("smtp.gmail.com", 587)
+        s.ehlo()
+        s.starttls()
+        s.login(self.config["smtp_user"], self.config["smtp_password"])
+        try:
+            s.send_message(msg)
+        except smtplib.SMTPException as ex:
+            self.errorMessage = ex
+        s.close()
     
     @Slot('QString')
     def submitReturn(self, serial):
