@@ -28,7 +28,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Are you dropping off a device for repair or picking up a repaired device?"
+            text: "How can we help you?"
             // anchors.fill: self
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter

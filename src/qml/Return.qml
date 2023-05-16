@@ -28,7 +28,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Use the barcode scanner to scan the barcode sticker on the loaner.\nReturn your loaner to the 'Loaner' area. Be sure to plug it into power."
+            text: "Use the barcode scanner to scan the barcode sticker on the loaner.\nReturn your loaner to the 'Loaner' area. Be sure to plug laptops into power."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap

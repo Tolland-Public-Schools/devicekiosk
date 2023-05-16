@@ -268,19 +268,13 @@ class UI(QObject):
         self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
         if (self.serviceMode == ServiceMode.pickup):
             self.showPickupSignal.emit()
-        elif(self.serviceMode == ServiceMode.dailyDeviceReturn):
+        else:
             self.returnDailyLoaner()
-        elif(self.serviceMode == ServiceMode.dailyChargerReturn):
-            self.returnDailyCharger()
 
     def returnDailyLoaner(self):
         print("python: returning daily loaner")
-        self.startOver()
-    
-    def returnDailyCharger(self):
-        print("python: returning daily charger")
-        self.startOver()
-
+        self.sendDailyEmail()
+        self.showFinishDailyReturnSignal.emit()    
 
     # Submit the QML form from Submit.qml
     @Slot()
