@@ -28,7 +28,7 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
 
-            text: "Use the barcode scanner to scan the barcode sticker on the loaner.\nReturn your loaner to the 'Loaner' area. Be sure to plug laptops into power."
+            text: "Take a laptop from the 'loaner' area. This device *must* be returned by the end of the school day. Use the barcode scanner to scan the barcode sticker on the loaner."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
@@ -36,12 +36,13 @@ Item {
 
         }
 
-        AnimatedImage {
-            id: image
-            Layout.alignment: Qt.AlignHCenter
-            source: "../images/return.gif"
-            fillMode: Image.Image.PreserveAspectCrop
-        }
+        // AnimatedImage {
+        //     id: image
+        //     Layout.alignment: Qt.AlignHCenter
+        //     source: "../images/loaner.gif"
+        //     fillMode: Image.Image.PreserveAspectCrop
+        // }
+
 
         TextField {
             id: inputSerial
@@ -55,11 +56,13 @@ Item {
             }
             
             Component.onCompleted: {
+                // console.log("inputEmail loaded")
                 this.focus = true
                 this.forceActiveFocus()
             }
         }
 
+        
         Button {
             id: btnNext
             text: "Next"
@@ -69,7 +72,7 @@ Item {
             Layout.fillHeight: true
 
             onClicked: {
-                ui.submitReturn(inputSerial.text)
+                ui.submitLoaner(inputSerial.text)
             }
         }
         Button {

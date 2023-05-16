@@ -42,6 +42,14 @@ ApplicationWindow {
             contentFrame.push(Qt.createComponent("Device.qml"))
         }
 
+        function onShowDailyLoanerDeviceScreenSignal() {
+            contentFrame.push(Qt.createComponent("DailyLoanerDevice.qml"))
+        }
+
+        function onShowDailyLoanerChargerScreenSignal() {
+            contentFrame.push(Qt.createComponent("DailyLoanerCharger.qml"))
+        }
+
         function onShowPrintSignal() {
             contentFrame.push(Qt.createComponent("Print.qml"))
         }
@@ -72,6 +80,14 @@ ApplicationWindow {
 
         function onShowFinishSignal(error) {
             contentFrame.push(Qt.createComponent("Finish.qml"))
+        }
+
+        function onShowFinishDailyBorrowSignal(error) {
+            contentFrame.push(Qt.createComponent("FinishDailyBorrow.qml"))
+        }
+
+        function onShowFinishDailyReturnSignal(error) {
+            contentFrame.push(Qt.createComponent("FinishDailyReturn.qml"))
         }
 
         function onShowEOYReturnSignal() {

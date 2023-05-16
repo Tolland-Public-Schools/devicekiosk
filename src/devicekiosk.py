@@ -29,6 +29,10 @@ class KioskMode(Enum):
 class ServiceMode(Enum):
     dropoff = 1
     pickup = 2
+    dailyDeviceBorrow = 3
+    dailyChargerBorrow = 4
+    dailyDeviceReturn = 5
+    dailyChargerReturn = 6
 
 class UI(QObject):
     majorVersion = 1
@@ -38,6 +42,7 @@ class UI(QObject):
     # Signals are special functions that allow a message to be sent from Python to QML UI
     # Instead of calling like a regular function, we call them as:
     # self.[signal].emit(argument)
+    showDailyLoanersSignal = Signal(None)
     showUserSignal = Signal(None)
     showEmailScreenSignal = Signal(None)
     startOverSignal = Signal(None)
@@ -56,6 +61,10 @@ class UI(QObject):
     showFinishSignal = Signal(None)
     showEOYReturnSignal = Signal(None)
     showEOYStartSignal = Signal(None)
+    showDailyLoanerDeviceScreenSignal = Signal(None)
+    showDailyLoanerChargerScreenSignal = Signal(None)
+    showFinishDailyBorrowSignal = Signal(None)
+    showFinishDailyReturnSignal = Signal(None)
     
     firstName = ""
     lastName = ""
@@ -75,6 +84,7 @@ class UI(QObject):
         path = os.path.dirname(os.path.abspath(__file__))
         configFile = os.path.join(path,'config.yml')
         self.config = yaml.safe_load(open(configFile))
+        print("devicekiosk.py daily loaner status: " + str(self.config["show_daily_loaner"]))
 
     # def toEmail(self):
     #     print("loading new qml")
@@ -125,6 +135,14 @@ class UI(QObject):
     #     else:
     #         self.showDeviceSignal.emit()
 
+    @Slot()
+    def showHideDailyLoaners(self):
+        if (self.config["show_daily_loaner"] == True):
+            print("showing daily loaners")
+            self.showDailyLoanersSignal.emit()
+        else:
+            print("keeping daily loaners hidden")
+
     @Slot(list)
     def submitUser(self, userInfo):
         print(userInfo)
@@ -137,8 +155,15 @@ class UI(QObject):
         self.studentID = self.studentID.replace(" ", "")
         self.emailAddress = self.firstName + self.lastName + self.studentID + "@tolland.k12.ct.us"
         print("Student email is: " + self.emailAddress)
+        print("Service mode is: " + str(self.serviceMode))
         if (self.serviceMode == ServiceMode.dropoff):
             self.showDescriptionSignal.emit()
+        elif (self.serviceMode == ServiceMode.dailyDeviceBorrow):
+            print("Python daily device mode")
+            self.showDailyLoanerDeviceScreenSignal.emit()
+        elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
+            print("Python daily charger mode")
+            self.showDailyLoanerChargerScreenSignal.emit()
         else:
             self.showReturnSignal.emit()
         
@@ -195,14 +220,61 @@ class UI(QObject):
         self.loanerSerialNumber = serial
         # Remove superflous spaces
         self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
-        self.showSubmitSignal.emit()
+        if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
+            self.sendDailyEmail()
+            self.showFinishDailyBorrowSignal.emit()
+        elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
+            self.sendDailyEmail()
+            self.showFinishDailyBorrowSignal.emit()
+        else:
+            self.showSubmitSignal.emit()
+
+    def sendDailyEmail(self):
+        msg = EmailMessage() 
+        if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
+            msg['Subject'] = f'Daily loaner device borrowed by: ' + self.firstName + ' ' + self.lastName
+            body = self.firstName + " " + self.lastName + " has borrowed a daily loaner device.\nStudent Number: " + self.studentID + "\nLoaner Device Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
+        elif (self.serviceMode == ServiceMode.dailyDeviceReturn):
+            msg['Subject'] = f'Daily loaner device returned by: ' + self.firstName + ' ' + self.lastName
+            body = self.firstName + " " + self.lastName + " has returned a daily loaner device.\nStudent Number: " + self.studentID + "\nLoaner Device Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
+        elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
+            msg['Subject'] = f'Daily loaner charger borrowed by: ' + self.firstName + ' ' + self.lastName
+            body = self.firstName + " " + self.lastName + " has borrowed a daily loaner charger.\nStudent Number: " + self.studentID + "\nLoaner Charger Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
+        elif (self.serviceMode == ServiceMode.dailyChargerReturn):
+            msg['Subject'] = f'Daily loaner charger returned by: ' + self.firstName + ' ' + self.lastName
+            body = self.firstName + " " + self.lastName + " has returned a daily loaner charger.\nStudent Number: " + self.studentID + "\nLoaner Charger Serial Number: " + self.loanerSerialNumber
+            msg.set_content(body)
+        msg['From'] = self.config["smtp_user"]
+        msg['To'] = self.config["daily_email_list"]
+
+        # Send the message via Gmail SMTP server
+        s = smtplib.SMTP("smtp.gmail.com", 587)
+        s.ehlo()
+        s.starttls()
+        s.login(self.config["smtp_user"], self.config["smtp_password"])
+        try:
+            s.send_message(msg)
+        except smtplib.SMTPException as ex:
+            self.errorMessage = ex
+        s.close()
     
     @Slot('QString')
     def submitReturn(self, serial):
         self.loanerSerialNumber = serial
         # Remove superflous spaces
         self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
-        self.showPickupSignal.emit()
+        if (self.serviceMode == ServiceMode.pickup):
+            self.showPickupSignal.emit()
+        else:
+            self.returnDailyLoaner()
+
+    def returnDailyLoaner(self):
+        print("python: returning daily loaner")
+        self.sendDailyEmail()
+        self.showFinishDailyReturnSignal.emit()    
 
     # Submit the QML form from Submit.qml
     @Slot()
