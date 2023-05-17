@@ -445,8 +445,7 @@ class UI(QObject):
         msg['Subject'] = 'Daily Loaner Report'
         msg.set_content(body)
         msg['From'] = self.config["smtp_user"]
-        # msg['To'] = self.config["daily_email_list"]
-        msg['To'] = "asher@tolland.k12.ct.us"
+        msg['To'] = self.config["daily_email_list"]
 
         # Send the message via Gmail SMTP server
         s = smtplib.SMTP("smtp.gmail.com", 587)
