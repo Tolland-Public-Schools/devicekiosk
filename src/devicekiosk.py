@@ -12,6 +12,7 @@ import zipfile
 import traceback
 import subprocess
 import uuid
+import sqlite3
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
@@ -221,13 +222,71 @@ class UI(QObject):
         # Remove superflous spaces
         self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
         if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
-            self.sendDailyEmail()
+            # self.sendDailyEmail()
+            self.addLoanerToDB("Laptop")
             self.showFinishDailyBorrowSignal.emit()
         elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
-            self.sendDailyEmail()
+            # self.sendDailyEmail()
+            self.addLoanerToDB("Charger")
             self.showFinishDailyBorrowSignal.emit()
         else:
             self.showSubmitSignal.emit()
+
+    def createDailyTableIfNotExists(self):
+        print("Creating daily table if it doesn't exist")
+        query = """ CREATE TABLE IF NOT EXISTS DAILY(
+                    Email TEXT NOT NULL,
+                    First_Name TEXT NOT NULL,
+                    Last_Name TEXT NOT NULL,
+                    Date_Borrowed TEXT NOT NULL,
+                    Date_Returned TEXT,
+                    Serial TEXT NOT NULL,
+                    Device TEXT NOT NULL
+                    ); """
+        try:   
+            # Connect to DB and create a cursor
+            sqliteConnection = sqlite3.connect('daily.db')
+            cursor = sqliteConnection.cursor()
+            cursor.execute(query)
+            cursor.close()
+        # Handle errors
+        except sqlite3.Error as error:
+            print('Error occurred - ', error) 
+        # Close DB Connection irrespective of success
+        # or failure
+        finally:        
+            if sqliteConnection:
+                sqliteConnection.close()
+                print('SQLite Connection closed')
+
+    def addLoanerToDB(self, device):
+        try:   
+            # Connect to DB and create a cursor
+            sqliteConnection = sqlite3.connect('daily.db')
+            cursor = sqliteConnection.cursor()
+                    
+            # Write a query and execute it with cursor
+            query = "INSERT INTO DAILY (Email, First_Name, Last_Name, Date_Borrowed, Serial, Device) VALUES (?, ?, ?, DATE('now'), ?, ?)"
+            args = (self.emailAddress, self.firstName, self.lastName, self.loanerSerialNumber, device)
+            cursor.execute(query, args)
+            sqliteConnection.commit()
+        
+            # Fetch and output result
+            # result = cursor.execute(query)
+        
+            # Close the cursor
+            cursor.close()
+        
+        # Handle errors
+        except sqlite3.Error as error:
+            print('Error occurred - ', error)
+ 
+        # Close DB Connection irrespective of success
+        # or failure
+        finally:        
+            if sqliteConnection:
+                sqliteConnection.close()
+                print('SQLite Connection closed')
 
     def sendDailyEmail(self):
         msg = EmailMessage() 
@@ -273,8 +332,40 @@ class UI(QObject):
 
     def returnDailyLoaner(self):
         print("python: returning daily loaner")
-        self.sendDailyEmail()
-        self.showFinishDailyReturnSignal.emit()    
+        # self.sendDailyEmail()
+        self.returnLoanerInDB()
+        self.showFinishDailyReturnSignal.emit()
+
+    
+    def returnLoanerInDB(self):
+        print("updating daily db for loaner device")
+        try:   
+            # Connect to DB and create a cursor
+            sqliteConnection = sqlite3.connect('daily.db')
+            cursor = sqliteConnection.cursor()
+                    
+            # Write a query and execute it with cursor
+            query = "UPDATE DAILY SET Date_Returned = DATE('now') WHERE (Email = ? AND Serial = ?)"
+            args = (self.emailAddress, self.loanerSerialNumber)
+            cursor.execute(query, args)
+            sqliteConnection.commit()
+        
+            # Fetch and output result
+            # result = cursor.execute(query)
+        
+            # Close the cursor
+            cursor.close()
+        
+        # Handle errors
+        except sqlite3.Error as error:
+            print('Error occurred - ', error)
+ 
+        # Close DB Connection irrespective of success
+        # or failure
+        finally:        
+            if sqliteConnection:
+                sqliteConnection.close()
+                print('SQLite Connection closed')
 
     # Submit the QML form from Submit.qml
     @Slot()
@@ -312,6 +403,61 @@ class UI(QObject):
         self.emailEOYReturnFiles(returnEmail)
         self.archiveReturns()
         self.showEOYStartSignal.emit()
+
+    @Slot()
+    def dailyReport(self):
+        print("Emailing daily report")
+        body = "Unreturned devices\n"
+        try:   
+            # Connect to DB and create a cursor
+            sqliteConnection = sqlite3.connect('daily.db')
+            cursor = sqliteConnection.cursor()
+                    
+            # Write a query and execute it with cursor
+            query = "SELECT * FROM DAILY WHERE Date_Returned IS NULL"
+            cursor.execute(query)
+        
+            # Fetch and output result
+            result = cursor.execute(query).fetchall()
+            for row in result:
+                # print(row[0])
+                body += row[1] + " " + row[2] + ": " + row[6] + " Serial Number: " + row[5] + " Borrowed on: " + row[3] + "\n"
+        
+            # Close the cursor
+            cursor.close()
+        
+        # Handle errors
+        except sqlite3.Error as error:
+            print('Error occurred - ', error)
+ 
+        # Close DB Connection irrespective of success
+        # or failure
+        finally:        
+            if sqliteConnection:
+                sqliteConnection.close()
+                print('SQLite Connection closed')
+        
+        print(body)
+        self.emailDailyReport(body)
+    
+    def emailDailyReport(self, body):
+        msg = EmailMessage()
+        msg['Subject'] = 'Daily Loaner Report'
+        msg.set_content(body)
+        msg['From'] = self.config["smtp_user"]
+        # msg['To'] = self.config["daily_email_list"]
+        msg['To'] = "asher@tolland.k12.ct.us"
+
+        # Send the message via Gmail SMTP server
+        s = smtplib.SMTP("smtp.gmail.com", 587)
+        s.ehlo()
+        s.starttls()
+        s.login(self.config["smtp_user"], self.config["smtp_password"])
+        try:
+            s.send_message(msg)
+        except smtplib.SMTPException as ex:
+            self.errorMessage = ex
+        s.close()
         
     def postToZenDesk(self):
         self.errorMessage = ""
@@ -425,6 +571,7 @@ if __name__ == "__main__":
     ui = UI()
     ui.loadConfig()
     ui.loadSchoolLogo()
+    ui.createDailyTableIfNotExists()
     
     engine = QQmlApplicationEngine()
     # Bind objects to the QML

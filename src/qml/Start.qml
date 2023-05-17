@@ -11,6 +11,7 @@ Item {
             btnDailyDeviceLoanerReturn.visible = true;
             btnDailyCharger.visible = true;
             btnDailyChargerReturn.visible = true;
+            btnDailyReport.visible = true;
         }
     }
     
@@ -133,6 +134,19 @@ Item {
                 // ui.toEmail()
                 // contentFrame.push(Qt.createComponent("Email.qml"))
                 ui.start(2)
+            }
+        }
+        Button {
+            id: btnDailyReport
+            text: "Email Daily Report"
+            visible: false
+            font.pointSize: 50
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            onClicked: {
+                // ui.toEmail()
+                // contentFrame.push(Qt.createComponent("Email.qml"))
+                ui.dailyReport()
             }
         }
     }
