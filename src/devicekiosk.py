@@ -438,7 +438,12 @@ class UI(QObject):
                 print('SQLite Connection closed')
         
         print(body)
-        self.emailDailyReport(body)
+        if (self.config["email_daily_report"] == True):
+            self.emailDailyReport(body)
+
+        if (self.config["print_daily_report"] == True):
+            lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
+            lpr.communicate(bytes(body, 'utf-8'))
     
     def emailDailyReport(self, body):
         msg = EmailMessage()

@@ -138,7 +138,7 @@ Item {
         }
         Button {
             id: btnDailyReport
-            text: "Email Daily Report"
+            text: "Daily Report"
             visible: false
             font.pointSize: 50
             Layout.fillWidth: true
