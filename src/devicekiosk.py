@@ -267,7 +267,7 @@ class UI(QObject):
                     
             # Write a query and execute it with cursor
             query = "INSERT INTO DAILY (Email, First_Name, Last_Name, Date_Borrowed, Serial, Device) VALUES (?, ?, ?, DATE('now'), ?, ?)"
-            args = (self.emailAddress, self.firstName, self.lastName, self.loanerSerialNumber, device)
+            args = (self.emailAddress.lower(), self.firstName, self.lastName, self.loanerSerialNumber.lower(), device)
             cursor.execute(query, args)
             sqliteConnection.commit()
         
@@ -346,7 +346,7 @@ class UI(QObject):
                     
             # Write a query and execute it with cursor
             query = "UPDATE DAILY SET Date_Returned = DATE('now') WHERE (Email = ? AND Serial = ?)"
-            args = (self.emailAddress, self.loanerSerialNumber)
+            args = (self.emailAddress.lower(), self.loanerSerialNumber.lower())
             cursor.execute(query, args)
             sqliteConnection.commit()
         
