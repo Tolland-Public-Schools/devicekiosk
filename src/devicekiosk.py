@@ -182,7 +182,15 @@ class UI(QObject):
         self.serviceMode = ServiceMode(mode)
         print("Service mode: ")
         print(self.serviceMode)
-        self.showUserSignal.emit()
+        
+        match self.serviceMode:
+            case ServiceMode.dailyDeviceReturn:
+                self.showReturnSignal.emit()
+            case ServiceMode.dailyChargerReturn:
+                self.showReturnSignal.emit()
+            case _:
+                self.showUserSignal.emit()
+
 
     @Slot('QString')
     def submitDescription(self, description):
@@ -338,15 +346,15 @@ class UI(QObject):
 
     
     def returnLoanerInDB(self):
-        print("updating daily db for loaner device")
+        print("updating daily db for loaner device " + self.loanerSerialNumber.lower())
         try:   
             # Connect to DB and create a cursor
             sqliteConnection = sqlite3.connect('daily.db')
             cursor = sqliteConnection.cursor()
                     
             # Write a query and execute it with cursor
-            query = "UPDATE DAILY SET Date_Returned = DATE('now') WHERE (Email = ? AND Serial = ?)"
-            args = (self.emailAddress.lower(), self.loanerSerialNumber.lower())
+            query = "UPDATE DAILY SET Date_Returned = DATE('now') WHERE Serial = ?"
+            args = [self.loanerSerialNumber.lower()]
             cursor.execute(query, args)
             sqliteConnection.commit()
         
