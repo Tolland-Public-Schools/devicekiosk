@@ -183,13 +183,21 @@ class UI(QObject):
         print("Service mode: ")
         print(self.serviceMode)
         
-        match self.serviceMode:
-            case ServiceMode.dailyDeviceReturn:
-                self.showReturnSignal.emit()
-            case ServiceMode.dailyChargerReturn:
-                self.showReturnSignal.emit()
-            case _:
-                self.showUserSignal.emit()
+        if (self.serviceMode == ServiceMode.dailyDeviceReturn):
+            self.showReturnSignal.emit()
+        elif (self.serviceMode == ServiceMode.dailyChargerReturn):
+            self.showReturnSignal.emit()
+        else:
+            self.showUserSignal.emit()
+
+        # Rocky Linux has Python 3.9, 3.10 required for switch/match statements
+        # match self.serviceMode:
+        #     case ServiceMode.dailyDeviceReturn:
+        #         self.showReturnSignal.emit()
+        #     case ServiceMode.dailyChargerReturn:
+        #         self.showReturnSignal.emit()
+        #     case _:
+        #         self.showUserSignal.emit()
 
 
     @Slot('QString')
