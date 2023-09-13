@@ -261,7 +261,9 @@ class UI(QObject):
                     ); """
         try:   
             # Connect to DB and create a cursor
-            sqliteConnection = sqlite3.connect('daily.db')
+            path = os.path.dirname(os.path.abspath(__file__))
+            db = os.path.join(path,'daily.db')
+            sqliteConnection = sqlite3.connect(db)
             cursor = sqliteConnection.cursor()
             cursor.execute(query)
             cursor.close()
@@ -278,7 +280,9 @@ class UI(QObject):
     def addLoanerToDB(self, device):
         try:   
             # Connect to DB and create a cursor
-            sqliteConnection = sqlite3.connect('daily.db')
+            path = os.path.dirname(os.path.abspath(__file__))
+            db = os.path.join(path,'daily.db')
+            sqliteConnection = sqlite3.connect(db)
             cursor = sqliteConnection.cursor()
                     
             # Write a query and execute it with cursor
@@ -357,7 +361,9 @@ class UI(QObject):
         print("updating daily db for loaner device " + self.loanerSerialNumber.lower())
         try:   
             # Connect to DB and create a cursor
-            sqliteConnection = sqlite3.connect('daily.db')
+            path = os.path.dirname(os.path.abspath(__file__))
+            db = os.path.join(path,'daily.db')
+            sqliteConnection = sqlite3.connect(db)
             cursor = sqliteConnection.cursor()
                     
             # Write a query and execute it with cursor
@@ -426,7 +432,9 @@ class UI(QObject):
         body = "Unreturned devices\n"
         try:   
             # Connect to DB and create a cursor
-            sqliteConnection = sqlite3.connect('daily.db')
+            path = os.path.dirname(os.path.abspath(__file__))
+            db = os.path.join(path,'daily.db')
+            sqliteConnection = sqlite3.connect(db)
             cursor = sqliteConnection.cursor()
                     
             # Write a query and execute it with cursor
