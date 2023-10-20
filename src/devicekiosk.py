@@ -519,21 +519,20 @@ class UI(QObject):
         # Package the data in a dictionary matching the expected JSON
         # "custom_fields": [{"id": 1500007314361, "value": "student_device"}]
         data = ""
-        match self.config["kiosk_mode"]:
-            # Regular mode
-            case 0:
-                data = {'ticket': {'subject': subject, 'comment': {'body': body},
-                                   'requester': {'name': self.firstName + " " + self.lastName, 'email': self.emailAddress},
-                                   'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},
-                                                     {'id': 1500007314401, 'value': self.config["school_abbreviation"]},
-                                                     {'id': 1900003862405, 'value': self.serialNumber}]}}
-            # Single user mode
-            case 1:
-                data = {'ticket': {'subject': subject, 'comment': {'body': body},
-                                   'requester': {'name': self.config["single_user_first_name"] + " " + self.config["single_user_last_name"], 'email': self.config["single_user_email_address"]},
-                                   'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},
-                                                     {'id': 1500007314401, 'value': self.config["school_abbreviation"]},
-                                                     {'id': 1900003862405, 'value': self.serialNumber}]}}
+        # Regular mode
+        if self.config["kiosk_mode"] == 0:
+            data = {'ticket': {'subject': subject, 'comment': {'body': body},
+                               'requester': {'name': self.firstName + " " + self.lastName, 'email': self.emailAddress},
+                               'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},
+                                                 {'id': 1500007314401, 'value': self.config["school_abbreviation"]},
+                                                 {'id': 1900003862405, 'value': self.serialNumber}]}}
+        # Single user mode
+        elif self.config["kiosk_mode"] == 1:
+            data = {'ticket': {'subject': subject, 'comment': {'body': body},
+                               'requester': {'name': self.config["single_user_first_name"] + " " + self.config["single_user_last_name"], 'email': self.config["single_user_email_address"]},
+                               'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},
+                                                 {'id': 1500007314401, 'value': self.config["school_abbreviation"]},
+                                                 {'id': 1900003862405, 'value': self.serialNumber}]}}
         return data
         
     def sendEmail(self):
