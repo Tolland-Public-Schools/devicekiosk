@@ -23,7 +23,7 @@ Item {
                 txtError.enabled = true
                 txtError.text = "Error: " + error
                 btnNext.text = "Start Over"
-            }            
+            }
         }
     }
     
@@ -35,13 +35,22 @@ Item {
             id: txtMessage
             Layout.fillWidth: true
             Layout.fillHeight: true
-
-            text: "Your ticket has been successfully submitted!\nPlease check your email for updates, including when your device is fixed and ready for pickup. You will *only* receive updates on this via email."
+            text: ""
+            // text: "Your ticket has been successfully submitted!\nPlease check your email for updates, including when your device is fixed and ready for pickup. You will *only* receive updates on this via email."
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
             font.pointSize: 30
-
+            Component.onCompleted: {
+                switch(ui.getKioskMode()) {
+                    case 0:
+                        this.text = "Your ticket has been successfully submitted!\nPlease check your email for updates, including when your device is fixed and ready for pickup. You will *only* receive updates on this via email."
+                        break;
+                    case 1:
+                        this.text = "Your ticket has been successfully submitted!\nUpdates on this repair will be sent to " + ui.getSingleUserName() + "."
+                        break;
+                }
+            }
         }
 
         Text {

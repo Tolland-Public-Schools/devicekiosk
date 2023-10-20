@@ -108,6 +108,10 @@ class UI(QObject):
     @Slot(None, result=int)
     def getKioskMode(self):
         return self.config["kiosk_mode"]
+
+    @Slot(None, result=str)
+    def getSingleUserName(self):
+        return self.config["single_user_first_name"] + " " + self.config["single_user_last_name"]
     
     @Slot(None, result=str)
     def getEOYEmailAddresses(self):
@@ -219,10 +223,9 @@ class UI(QObject):
         ticket = self.schoolLogo + "\nEmail: " + self.emailAddress + "\nService Tag: " + self.serialNumber + "\nDate: " + date.strftime("%x") + "\nDescription: " + self.description
         ticket += "\n\n\n----- IT Use -----\n\n\nTicket Number: \n\n\n\n\n\nDate Completed:\n\n\n\n\n\nAdditional Information:"
         print(ticket)
-        lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
+        lpr = subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
         lpr.communicate(bytes(ticket, 'utf-8'))
         self.enableNextSignal.emit()
-        
 
     @Slot()
     def submitPrint(self):
@@ -489,13 +492,9 @@ class UI(QObject):
         
     def postToZenDesk(self):
         self.errorMessage = ""
-        # New ticket info
-        subject = self.firstName + " " + self.lastName + " Student Device Issue"
-        body = self.description + "\nLoaner ID: " + self.loanerSerialNumber
-        # Package the data in a dictionary matching the expected JSON
-        # "custom_fields": [{"id": 1500007314361, "value": "student_device"}]
-        data = {'ticket': {'subject': subject, 'comment': {'body': body}, 'requester': {'name': self.firstName + " " + self.lastName, 'email': self.emailAddress}, 'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},{'id': 1500007314401, 'value':'ths'},{'id': 1900003862405, 'value': self.serialNumber}]}}
+        data = self.createZenDeskTicketBody()
         # Encode the data to create a JSON payload
+        print(data)
         payload = json.dumps(data)
         # Set the request parameters
         url = "https://" + self.config["zendesk_domain"] + ".zendesk.com/api/v2/tickets.json"
@@ -512,6 +511,30 @@ class UI(QObject):
             return
         # Report success
         print('Successfully created the ticket.')
+
+    def createZenDeskTicketBody(self):
+        # New ticket info
+        subject = self.firstName + " " + self.lastName + " Student Device Issue"
+        body = self.description + "\nLoaner ID: " + self.loanerSerialNumber
+        # Package the data in a dictionary matching the expected JSON
+        # "custom_fields": [{"id": 1500007314361, "value": "student_device"}]
+        data = ""
+        match self.config["kiosk_mode"]:
+            # Regular mode
+            case 0:
+                data = {'ticket': {'subject': subject, 'comment': {'body': body},
+                                   'requester': {'name': self.firstName + " " + self.lastName, 'email': self.emailAddress},
+                                   'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},
+                                                     {'id': 1500007314401, 'value': self.config["school_abbreviation"]},
+                                                     {'id': 1900003862405, 'value': self.serialNumber}]}}
+            # Single user mode
+            case 1:
+                data = {'ticket': {'subject': subject, 'comment': {'body': body},
+                                   'requester': {'name': self.config["single_user_first_name"] + " " + self.config["single_user_last_name"], 'email': self.config["single_user_email_address"]},
+                                   'custom_fields': [{'id': 1500007314361, 'value': 'student_device'},
+                                                     {'id': 1500007314401, 'value': self.config["school_abbreviation"]},
+                                                     {'id': 1900003862405, 'value': self.serialNumber}]}}
+        return data
         
     def sendEmail(self):
         msg = EmailMessage()        
@@ -612,4 +635,4 @@ if __name__ == "__main__":
     app.setWindowIcon(QtGui.QIcon(icon))
     
     engine.load(qml)
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
