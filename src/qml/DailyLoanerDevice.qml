@@ -4,6 +4,13 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
+    Connections {
+        target: ui        
+
+        function onShowOutstandingLoansSignal(serials) {
+            txtInstructions.text += "\nNOTE: The following device(s) are currently checked out by this student: " + serials + "\n"
+        }
+    }
 
     function verifyForm() {
         if (inputSerial.text.toString().length > 0) {        
@@ -16,15 +23,16 @@ Item {
 
     function setFocus() {
         inputSerial.focus = true
-        inputSerial.forceActiveFocus()
+        inputSerial.forceActiveFocus()            
     }
+    
 
     ColumnLayout {
             anchors.fill: parent
             // spacing: 2
 
         Text {
-            id: txtEmail
+            id: txtInstructions
             Layout.fillWidth: true
             Layout.fillHeight: true
 
@@ -33,6 +41,10 @@ Item {
             verticalAlignment: Text.AlignVCenter
             wrapMode: Text.WordWrap
             font.pointSize: 30
+
+            Component.onCompleted: {
+                ui.checkForOustandingLoans()
+            }
 
         }
 

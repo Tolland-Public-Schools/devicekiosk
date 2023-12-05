@@ -66,6 +66,7 @@ class UI(QObject):
     showDailyLoanerChargerScreenSignal = Signal(None)
     showFinishDailyBorrowSignal = Signal(None)
     showFinishDailyReturnSignal = Signal(None)
+    showOutstandingLoansSignal = Signal(str)
     
     firstName = ""
     lastName = ""
@@ -471,6 +472,57 @@ class UI(QObject):
         if (self.config["print_daily_report"] == True):
             lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
             lpr.communicate(bytes(body, 'utf-8'))
+
+    @Slot()
+    def checkForOustandingLoans(self):
+        print("Checking for outstanding loans")
+
+        loanedDevices = ""
+
+        deviceType = ""
+        if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
+            deviceType = "Laptop"
+        elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
+            deviceType = "Charger"
+        
+        print("Email adddress: " + self.emailAddress.lower())
+        print("Device type: " + deviceType)
+
+        try:   
+            # Connect to DB and create a cursor
+            path = os.path.dirname(os.path.abspath(__file__))
+            db = os.path.join(path,'daily.db')
+            sqliteConnection = sqlite3.connect(db)
+            cursor = sqliteConnection.cursor()
+                    
+            # Write a query and execute it with cursor
+            query = "SELECT Serial FROM DAILY WHERE Date_Returned IS NULL AND Email = ? AND Device = ?"
+            args = (self.emailAddress.lower(), deviceType)
+            print(args)
+            #cursor.execute(query, args)
+        
+            # Fetch and output result
+            result = cursor.execute(query, args).fetchall()
+            print(result)
+            if (len(result) > 0):
+                for entry in result:
+                    print(entry[0])
+                    loanedDevices += entry[0] + " "
+                self.showOutstandingLoansSignal.emit(loanedDevices)
+                    
+            # Close the cursor
+            cursor.close()
+        
+        # Handle errors
+        except sqlite3.Error as error:
+            print('Error occurred - ', error)
+ 
+        # Close DB Connection irrespective of success
+        # or failure
+        finally:        
+            if sqliteConnection:
+                sqliteConnection.close()
+                print('SQLite Connection closed')
     
     def emailDailyReport(self, body):
         msg = EmailMessage()
