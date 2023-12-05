@@ -8,23 +8,23 @@ Item {
         target: ui        
 
         function onShowOutstandingLoansSignal(serials) {
-            txtInstructions.text += "\nNOTE: The following devices are currently checked out by this student: " + serials + "\n"
+            txtInstructions.text += "\nNOTE: The following device(s) are currently checked out by this student: " + serials + "\n"
         }
     }
 
     function verifyForm() {
-            if (inputSerial.text.toString().length > 0) {        
-                btnNext.enabled = true
-            }
-            else {
-                btnNext.enabled = false
-            }
+        if (inputSerial.text.toString().length > 0) {        
+            btnNext.enabled = true
         }
+        else {
+            btnNext.enabled = false
+        }
+    }
 
-        function setFocus() {
-            inputSerial.focus = true
-            inputSerial.forceActiveFocus()            
-        }
+    function setFocus() {
+        inputSerial.focus = true
+        inputSerial.forceActiveFocus()            
+    }
     
 
     ColumnLayout {
