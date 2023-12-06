@@ -539,6 +539,63 @@ class UI(QObject):
                 sqliteConnection.close()
                 print('SQLite Connection closed')
     
+    @Slot()
+    def generateBorrowReport(self):
+        currentSchoolYear = self.thisSchoolYear()
+        reportAsOf = "8/1/" + currentSchoolYear
+        # print("Generating borrow report since " + currentSchoolYear + "-08-01")
+        body = "Borrowed Report since " + reportAsOf + "\n"
+        body += "Devices\n"
+        body += self.generateBorrowReportFromSQL(currentSchoolYear, "Laptop")
+        body += "Chargers\n"
+        body += self.generateBorrowReportFromSQL(currentSchoolYear, "Charger")
+        print(body)
+
+    def generateBorrowReportFromSQL(self, currentSchoolYear, deviceType):
+        try:   
+            # Connect to DB and create a cursor
+            path = os.path.dirname(os.path.abspath(__file__))
+            db = os.path.join(path,'daily.db')
+            sqliteConnection = sqlite3.connect(db)
+            cursor = sqliteConnection.cursor()
+                    
+            # Write a query and execute it with cursor
+            query = """SELECT Last_Name, First_Name, COUNT(*) AS count FROM DAILY WHERE Device = ? AND
+                date_borrowed BETWEEN ? AND 'now'
+                GROUP BY Last_Name, First_Name
+                ORDER BY Last_Name ASC;"""
+            args = (deviceType, currentSchoolYear + "-08-01")
+            
+            report = ""
+        
+            # Fetch and output result
+            result = cursor.execute(query, args).fetchall()
+            for row in result:
+                report += row[0] + ", " + row[1] + ": " + str(row[2]) + "\n"
+                        
+            # Close the cursor
+            cursor.close()
+
+            return report
+        
+        # Handle errors
+        except sqlite3.Error as error:
+            print('Error occurred - ', error)
+ 
+        # Close DB Connection irrespective of success
+        # or failure
+        finally:        
+            if sqliteConnection:
+                sqliteConnection.close()
+                print('SQLite Connection closed')
+    
+    def thisSchoolYear(self):
+        today = datetime.date.today()
+        if today.month < 8:
+            return str(today.year - 1)
+        else:
+            return str(today.year)
+
     # Email the daily loaner report
     def emailDailyReport(self, body):
         msg = EmailMessage()
@@ -700,6 +757,8 @@ if __name__ == "__main__":
     ui.loadConfig()
     ui.loadSchoolLogo()
     ui.createDailyTableIfNotExists()
+
+    ui.generateBorrowReport()
     
     engine = QQmlApplicationEngine()
     # Bind objects to the QML
