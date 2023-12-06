@@ -4,7 +4,13 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
+    Connections {
+        target: ui        
 
+        function onShowOutstandingLoansSignal(serials) {
+            txtInstructions.text += "\nNOTE: The following charger(s) are currently checked out by this student: " + serials + "\n"
+        }
+    }
     function verifyForm() {
         if (inputSerial.text.toString().length > 0) {        
             btnNext.enabled = true
@@ -24,7 +30,7 @@ Item {
             // spacing: 2
 
         Text {
-            id: txtEmail
+            id: txtInstructions
             Layout.fillWidth: true
             Layout.fillHeight: true
 
@@ -59,6 +65,7 @@ Item {
                 // console.log("inputEmail loaded")
                 this.focus = true
                 this.forceActiveFocus()
+                ui.checkForOustandingLoans()
             }
         }
 
