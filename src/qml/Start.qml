@@ -13,6 +13,9 @@ Item {
             btnDailyChargerReturn.visible = true;
             btnDailyReport.visible = true;
         }
+        function onShowLoanersReportSignal(){
+            btnLoanerReport.visible = true;
+        }
     }
     
     function showHideDailyLoaners() {
@@ -136,22 +139,35 @@ Item {
                 ui.start(2)
             }
         }
-        Button {
+        RowLayout {
+            // Will be handy when PySide6 supports uniformCellSizes
+            // uniformCellSizes: true
+            Button {
             id: btnDailyReport
-            text: "Daily Report"
+            text: "Print Daily Report"
             visible: false
             font.pointSize: 50
             Layout.fillWidth: true
             Layout.fillHeight: true
             onClicked: {
-                // ui.toEmail()
-                // contentFrame.push(Qt.createComponent("Email.qml"))
                 ui.dailyReport()
             }
+            }
+            Button {
+                id: btnLoanerReport
+                text: "Print Total\nBorrows by Student"
+                visible: false
+                font.pointSize: 50
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                onClicked: {
+                    ui.generateBorrowReport()
+                }
+            }
         }
+        
     }
-    // Setting focus any other way doesn't seem to work. 
-    // Kind of kludge, but works
+    // Show/hide daily loaner buttons based on config
     Timer {
         interval: 100
         running: true

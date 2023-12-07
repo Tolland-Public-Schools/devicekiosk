@@ -47,6 +47,7 @@ class UI(QObject):
     # Instead of calling like a regular function, we call them as:
     # self.[signal].emit(argument)
     showDailyLoanersSignal = Signal(None)
+    showLoanersReportSignal = Signal(None)
     showUserSignal = Signal(None)
     showEmailScreenSignal = Signal(None)
     startOverSignal = Signal(None)
@@ -66,7 +67,7 @@ class UI(QObject):
     showEOYReturnSignal = Signal(None)
     showEOYStartSignal = Signal(None)
     showDailyLoanerDeviceScreenSignal = Signal(None)
-    showDailyLoanerChargerScreenSignal = Signal(None)
+    showDailyLoanerChargerScreenSignal = Signal(None)    
     showFinishDailyBorrowSignal = Signal(None)
     showFinishDailyReturnSignal = Signal(None)
     showOutstandingLoansSignal = Signal(str)
@@ -139,6 +140,12 @@ class UI(QObject):
             self.showDailyLoanersSignal.emit()
         else:
             print("keeping daily loaners hidden")
+        
+        if (self.config["show_loaner_report"] == True):
+            print("showing loaner report")
+            self.showLoanersReportSignal.emit()
+        else:
+            print("keeping loaner report hidden")
 
     # Receive data from User.qml and direct set the correct next screen based on the service mode
     @Slot(list)
@@ -550,7 +557,7 @@ class UI(QObject):
         body += "\n--- Chargers ---\n"
         body += self.generateBorrowReportFromSQL(currentSchoolYear, "Charger")
         print(body)
-        #self.printBorrowReport(body)
+        self.printBorrowReport(body)
 
     def generateBorrowReportFromSQL(self, currentSchoolYear, deviceType):
         try:   
