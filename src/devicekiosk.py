@@ -545,11 +545,12 @@ class UI(QObject):
         reportAsOf = "8/1/" + currentSchoolYear
         # print("Generating borrow report since " + currentSchoolYear + "-08-01")
         body = "Borrowed Report since " + reportAsOf + "\n"
-        body += "Devices\n"
+        body += "--- Devices ---\n"
         body += self.generateBorrowReportFromSQL(currentSchoolYear, "Laptop")
-        body += "Chargers\n"
+        body += "\n--- Chargers ---\n"
         body += self.generateBorrowReportFromSQL(currentSchoolYear, "Charger")
         print(body)
+        #self.printBorrowReport(body)
 
     def generateBorrowReportFromSQL(self, currentSchoolYear, deviceType):
         try:   
@@ -563,7 +564,7 @@ class UI(QObject):
             query = """SELECT Last_Name, First_Name, COUNT(*) AS count FROM DAILY WHERE Device = ? AND
                 date_borrowed BETWEEN ? AND 'now'
                 GROUP BY Last_Name, First_Name
-                ORDER BY Last_Name ASC;"""
+                ORDER BY count DESC, Last_Name ASC;"""
             args = (deviceType, currentSchoolYear + "-08-01")
             
             report = ""
@@ -588,6 +589,10 @@ class UI(QObject):
             if sqliteConnection:
                 sqliteConnection.close()
                 print('SQLite Connection closed')
+    
+    def printBorrowReport(self, report):
+        lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
+        lpr.communicate(bytes(report, 'utf-8'))        
     
     def thisSchoolYear(self):
         today = datetime.date.today()
@@ -757,8 +762,6 @@ if __name__ == "__main__":
     ui.loadConfig()
     ui.loadSchoolLogo()
     ui.createDailyTableIfNotExists()
-
-    ui.generateBorrowReport()
     
     engine = QQmlApplicationEngine()
     # Bind objects to the QML
