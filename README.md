@@ -36,6 +36,8 @@ You must also have a file called config.yml in the same folder as the devicekios
     eoy_return_addresses: EOY email addresses
     # Show daily loaner:true will add buttons on the start screen for daily device and charger borrowing
     show_daily_loaner: true
+    # Show the button to print a report of daily loaner usage by student
+    show_loaner_report: true
     # Email address that daily borrow/return notifications will be sent to
     daily_email_list: daily borrowed device email address
     email_daily_report: false
