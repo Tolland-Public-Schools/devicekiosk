@@ -44,3 +44,7 @@ You must also have a file called config.yml in the same folder as the devicekios
     print_daily_report: true
     single_user_email_address: email address to own ZenDesk ticket when kiosk in single user mode
     school_abbreviation: abbreviation to use in ZenDesk for school dropdown
+    # Should we ask the user what their home room is?
+    show_homeroom_page: false
+    # What name should we use for 'homeroom'?  (e.g. 'homeroom', 'advisory', 'block')
+    homeroom_label: Block 4 class

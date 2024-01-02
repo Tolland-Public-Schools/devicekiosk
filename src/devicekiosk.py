@@ -71,6 +71,8 @@ class UI(QObject):
     showFinishDailyBorrowSignal = Signal(None)
     showFinishDailyReturnSignal = Signal(None)
     showOutstandingLoansSignal = Signal(str)
+    showDailyHomeroomPageSignal = Signal(None)
+    setHomeroomLabelSignal = Signal(str)
     
     firstName = ""
     lastName = ""
@@ -82,6 +84,7 @@ class UI(QObject):
     serviceMode = ServiceMode.dropoff
     schoolLogo = ""
     errorMessage = ""
+    homeroom = ""
     config = None
 
     def loadConfig(self):
@@ -251,15 +254,31 @@ class UI(QObject):
         # Remove superflous spaces
         self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
         if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
-            # self.sendDailyEmail()
-            self.addLoanerToDB("Laptop")
-            self.showFinishDailyBorrowSignal.emit()
+            # self.sendDailyEmail()            
+            if (self.config["show_homeroom_page"]):
+                self.showDailyHomeroomPageSignal.emit()
+            else:
+                self.addLoanerToDB("Laptop")
+                self.showFinishDailyBorrowSignal.emit()
         elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
-            # self.sendDailyEmail()
-            self.addLoanerToDB("Charger")
-            self.showFinishDailyBorrowSignal.emit()
+            # self.sendDailyEmail()            
+            if (self.config["show_homeroom_page"]):
+                self.showDailyHomeroomPageSignal.emit()
+            else:
+                self.addLoanerToDB("Charger")
+                self.showFinishDailyBorrowSignal.emit()
         else:
             self.showSubmitSignal.emit()
+
+    # Receive the homeroom from Homeroom.qml and set the screen in QML
+    @Slot('QString')
+    def submitHomeroom(self, homeroom):
+        self.homeroom = homeroom
+        if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
+             self.addLoanerToDB("Laptop")
+        elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
+            self.addLoanerToDB("Charger")
+        self.showFinishDailyBorrowSignal.emit()
 
     # On startup, we'll create the daily loaner table in daily.db if it doesn't exist
     def createDailyTableIfNotExists(self):
@@ -271,7 +290,8 @@ class UI(QObject):
                     Date_Borrowed TEXT NOT NULL,
                     Date_Returned TEXT,
                     Serial TEXT NOT NULL,
-                    Device TEXT NOT NULL
+                    Device TEXT NOT NULL,
+                    Homeroom TEXT
                     ); """
         try:   
             # Connect to DB and create a cursor
@@ -301,8 +321,8 @@ class UI(QObject):
             cursor = sqliteConnection.cursor()
                     
             # Write a query and execute it with cursor
-            query = "INSERT INTO DAILY (Email, First_Name, Last_Name, Date_Borrowed, Serial, Device) VALUES (?, ?, ?, DATE('now'), ?, ?)"
-            args = (self.emailAddress.lower(), self.firstName, self.lastName, self.loanerSerialNumber.lower(), device)
+            query = "INSERT INTO DAILY (Email, First_Name, Last_Name, Date_Borrowed, Serial, Device, Homeroom) VALUES (?, ?, ?, DATE('now'), ?, ?, ?)"
+            args = (self.emailAddress.lower(), self.firstName, self.lastName, self.loanerSerialNumber.lower(), device, self.homeroom)
             cursor.execute(query, args)
             sqliteConnection.commit()
         
@@ -431,6 +451,11 @@ class UI(QObject):
         self.sendEmail()
         self.enableNextSignal.emit()
 
+    # Get the name for 'homeroom'
+    @Slot()
+    def getAndSetHomeroomName(self):
+        self.setHomeroomLabelSignal.emit(self.config["homeroom_label"])
+    
     # Process an end of year return from EOYReturn.qml
     @Slot(list)
     def submitEOYReturn(self, returnInfo):
@@ -469,7 +494,11 @@ class UI(QObject):
             result = cursor.execute(query).fetchall()
             for row in result:
                 # print(row[0])
-                body += row[1] + " " + row[2] + ": " + row[6] + " Serial Number: " + row[5] + " Borrowed on: " + row[3] + "\n"
+                body += row[1] + " " + row[2] + ": " + row[6] + " #: " + row[5] + " Borrowed: " + row[3]
+                # If this kiosk shows the Homeroom page, add the homeroom to the report
+                if (self.config["show_homeroom_page"] == True):
+                    body += " " + self.config["homeroom_label"] + ": " + str(row[7])
+                body += "\n"
         
             # Close the cursor
             cursor.close()
