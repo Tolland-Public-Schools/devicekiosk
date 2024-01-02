@@ -50,6 +50,10 @@ ApplicationWindow {
             contentFrame.push(Qt.createComponent("DailyLoanerCharger.qml"))
         }
 
+        function onShowDailyHomeroomPageSignal() {
+            contentFrame.push(Qt.createComponent("DailyHomeroom.qml"))
+        }
+
         function onShowPrintSignal() {
             contentFrame.push(Qt.createComponent("Print.qml"))
         }
