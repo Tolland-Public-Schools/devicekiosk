@@ -1,7 +1,7 @@
 # Private
 apitoken.txt
 src/apitoken.txt
-src/config.yml
+src/config-devel.yml
 return-archive
 *.csv
 *.db

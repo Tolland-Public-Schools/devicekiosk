@@ -89,7 +89,13 @@ class UI(QObject):
 
     def loadConfig(self):
         path = os.path.dirname(os.path.abspath(__file__))
-        configFile = os.path.join(path,'config.yml')
+        # Check for a config-devel.yml file for development
+        if os.path.exists(os.path.join(path,'config-devel.yml')):
+            print('Using config-devel.yml')
+            configFile = os.path.join(path,'config-devel.yml')
+        # Otherwise, use the standard config.yml
+        else:
+            configFile = os.path.join(path,'config.yml')
         self.config = yaml.safe_load(open(configFile))
         print("devicekiosk.py daily loaner status: " + str(self.config["show_daily_loaner"]))
 

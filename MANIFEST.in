@@ -1,3 +1,4 @@
 include src/icon/*
 include src/images/*
 include src/qml/*
+include src/config.yml
