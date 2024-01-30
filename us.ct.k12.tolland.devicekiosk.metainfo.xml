@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component type="desktop">
+  <id>us.ct.k12.tolland.devicekiosk</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Device Kiosk</name>
+  <name xml:lang="x-test">xxDevice Kioskxx</name>
+  <summary>Student Self-Service Device Repair Kiosk</summary>
+  <summary xml:lang="x-test">xxStudent Self-Service Device Repair Kioskxx</summary>
+  <description>
+    <p>Student Self-Service Device Repair Kiosk</p>
+    <p xml:lang="x-test">xxStudent Self-Service Device Repair Kioskxx</p>
+  </description>
+  <url type="homepage">https://www.tolland.k12.ct.us</url>
+  <releases>
+    <release version="2.0.0" date="2024-01-30">
+      <description>
+        <p>Student Self-Service Device Repair Kiosk</p>
+      </description>
+    </release>
+  </releases>
+  <provides>
+    <binary>devicekiosk</binary>
+  </provides>
+</component>
