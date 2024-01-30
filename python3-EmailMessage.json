@@ -1,0 +1,14 @@
+{
+    "name": "python3-EmailMessage",
+    "buildsystem": "simple",
+    "build-commands": [
+        "pip3 install --verbose --exists-action=i --no-index --find-links=\"file://${PWD}\" --prefix=${FLATPAK_DEST} \"EmailMessage\" --no-build-isolation"
+    ],
+    "sources": [
+        {
+            "type": "file",
+            "url": "https://files.pythonhosted.org/packages/a1/a6/b18c5bc189fe21eda358eae77f3a401b7f8856b072df17eafdbef9b308bb/emailmessage-0.2.1-py3-none-any.whl",
+            "sha256": "49676c4812c6e1acab30878df1e734b8f7474dcb83cc6488559f575ca567c437"
+        }
+    ]
+}

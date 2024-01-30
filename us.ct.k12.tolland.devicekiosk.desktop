@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Device Kiosk
+GenericName=Device Kiosk
+Comment=Student Self-Service Kiosk
+Version=2.0.0
+Exec=devicekiosk
+Type=Application
+Icon=us.ct.k12.tolland.devicekiosk
+Categories=Office;
+X-KDE-FormFactor=desktop;tablet;handset;
