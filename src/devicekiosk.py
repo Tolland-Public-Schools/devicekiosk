@@ -13,6 +13,7 @@ import traceback
 import subprocess
 import uuid
 import sqlite3
+import base64
 
 from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtQml import QQmlApplicationEngine
@@ -86,6 +87,7 @@ class UI(QObject):
     errorMessage = ""
     homeroom = ""
     config = None
+    powerschoolAuthorizationToken = ""
 
     def loadConfig(self):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -93,6 +95,7 @@ class UI(QObject):
         if os.path.exists(os.path.join(path,'config-devel.yml')):
             print('Using config-devel.yml')
             configFile = os.path.join(path,'config-devel.yml')
+        # TODO: Check if config.yml exists, if not, copy from config-example.yml to config.yml and open file
         # Otherwise, use the standard config.yml
         else:
             configFile = os.path.join(path,'config.yml')
@@ -483,7 +486,11 @@ class UI(QObject):
     # Report will be sent via email and/or printed to the default printer based on the config file
     @pyqtSlot()
     def dailyReport(self):
-        print("Emailing daily report")
+        print("Creating daily report")
+
+        if (self.config["homeroom_from_ps"] == True):
+            self.authenticateWithPowerSchool()
+        
         body = "Unreturned devices\n"
         try:   
             # Connect to DB and create a cursor
@@ -501,8 +508,13 @@ class UI(QObject):
             for row in result:
                 # print(row[0])
                 body += row[1] + " " + row[2] + ": " + row[6] + " #: " + row[5] + " Borrowed: " + row[3]
-                # If this kiosk shows the Homeroom page, add the homeroom to the report
-                if (self.config["show_homeroom_page"] == True):
+                # If the homeroom is set to be pulled from PowerSchool, add the homeroom to the report
+                if (self.config["homeroom_from_ps"] == True):
+                    studentNumber = self.getStudentNumberFromEmailAddress(row[0])
+                    homeroom = self.getHomeRoomFromPowerSchool(studentNumber)
+                    body += " Home Room: " + homeroom
+                # Otherwise, if this kiosk shows the Homeroom page, add the homeroom to the report
+                elif (self.config["show_homeroom_page"] == True):
                     body += " " + self.config["homeroom_label"] + ": " + str(row[7])
                 body += "\n"
         
@@ -527,6 +539,58 @@ class UI(QObject):
         if (self.config["print_daily_report"] == True):
             lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
             lpr.communicate(bytes(body, 'utf-8'))
+
+    def getStudentNumberFromEmailAddress(self, emailAddress):
+        print("Getting student number from email address")
+        # Get the student number from the email address
+        # The email address is in the format FirstLastStudentNumber@tolland.k12.ct.us
+        # We'll remove the @tolland.k12.ct.us
+        emailParts = emailAddress.split("@") 
+        user = emailParts[0]
+        # The student number is the last 5 characters of the email address
+        studentNumber = user[-5:]
+        print("Student number: " + studentNumber)
+        return studentNumber
+    
+    def authenticateWithPowerSchool(self):
+        print("Authenticating with PowerSchool")
+
+        data = self.config["ps_client_id"] + ":" + self.config["ps_client_secret"]
+        base64Credentials = base64.b64encode(data.encode('utf-8')).decode('utf-8')
+
+        url = self.config["ps_api_url"] + "/oauth/access_token/"
+
+        print(url)
+
+        payload = "grant_type=client_credentials"
+        headers = {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+            "Authorization": "Basic " + base64Credentials
+        }
+
+        response = requests.request("POST", url, data=payload, headers=headers)
+        data = response.json()
+
+        # print(data["access_token"])
+        self.powerschoolAuthorizationToken = data["access_token"]
+    
+    def getHomeRoomFromPowerSchool(self, studentID):
+        print("Getting homeroom from PowerSchool")
+        url = self.config["ps_api_url"] + "/ws/schema/query/us.ct.k12.tolland.devicekiosk.students.get_home_room"
+
+        payload = {"studentNumber": studentID}
+        headers = {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+            "Authorization": "Bearer " + self.powerschoolAuthorizationToken
+        }
+
+        response = requests.request("POST", url, json=payload, headers=headers)
+        data = response.json()
+        # PowerSchool response will look like this: {"record":[{"home_room":"Last - First - Room"}],"@extensions":""}
+        home_room = data["record"][0]["home_room"]
+        print(home_room)
+        return home_room
 
     # Check the daily loaner database for outstanding loans
     # If there are outstanding loans, display on the daily loaner screen (DailyLoanerDevice.qml or DailyLoanerCharger.qml)

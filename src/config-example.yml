@@ -28,3 +28,10 @@ school_abbreviation: EHS
 show_homeroom_page: true
 # What name should we use for 'homeroom'?  (e.g. 'homeroom', 'advisory', 'block')
 homeroom_label: Home Room
+# Should get get homeroom from PowerSchool? If true, overrides data from the homeroom page
+homeroom_from_ps: false
+# PowerSchool API URL, base URL for your PowerSchool server
+ps_api_url: https://school.example.com
+# PowerSchool Client Secrets {Client ID:Client Secret}
+ps_client_id: 123456
+ps_client_secret: abcdef
