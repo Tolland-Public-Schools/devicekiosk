@@ -40,6 +40,7 @@ share/python-wheels/
 MANIFEST
 .flatpak-builder
 repo
+flatpak-build-dir
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
