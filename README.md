@@ -15,6 +15,10 @@ buildlinuxbinaries.sh
 
 or
 
+buildflatpak.sh
+
+or
+
 buildwindowsbinaries.ps1
 
 To use homeroom lookups via PowerSchool, install the PowerSchool Device Kiosk plugin from https://github.com/Tolland-Public-Schools/devicekiosk-powerschool-plugin
