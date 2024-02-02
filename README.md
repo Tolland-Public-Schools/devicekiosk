@@ -17,4 +17,4 @@ or
 
 buildwindowsbinaries.ps1
 
-You must also configure the config.yml file in the folder named _internal wherever the application is located
+To use homeroom lookups via PowerSchool, install the PowerSchool Device Kiosk plugin from https://github.com/Tolland-Public-Schools/devicekiosk-powerschool-plugin
