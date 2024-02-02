@@ -1,3 +1,6 @@
+# Example configuration file for the Device Loaner Kiosk
+# If you are seeing this file, there was no config.yml file found when the app as run
+# Please enter the correct information then re-open the app
 zendesk_domain: yourzendeskdomain
 zendesk_user: user@example.com/token
 zendesk_token: 123abc456
@@ -28,3 +31,10 @@ school_abbreviation: EHS
 show_homeroom_page: true
 # What name should we use for 'homeroom'?  (e.g. 'homeroom', 'advisory', 'block')
 homeroom_label: Home Room
+# Should get get homeroom from PowerSchool? If true, overrides data from the homeroom page
+homeroom_from_ps: false
+# PowerSchool API URL, base URL for your PowerSchool server
+ps_api_url: https://school.example.com
+# PowerSchool Client Secrets {Client ID:Client Secret}
+ps_client_id: 123456
+ps_client_secret: abcdef
