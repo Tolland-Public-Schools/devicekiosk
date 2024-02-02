@@ -1,3 +1,6 @@
+# Example configuration file for the Device Loaner Kiosk
+# If you are seeing this file, there was no config.yml file found when the app as run
+# Please enter the correct information then re-open the app
 zendesk_domain: yourzendeskdomain
 zendesk_user: user@example.com/token
 zendesk_token: 123abc456

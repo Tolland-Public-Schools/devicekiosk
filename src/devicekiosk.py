@@ -95,7 +95,19 @@ class UI(QObject):
         if os.path.exists(os.path.join(path,'config-devel.yml')):
             print('Using config-devel.yml')
             configFile = os.path.join(path,'config-devel.yml')
-        # TODO: Check if config.yml exists, if not, copy from config-example.yml to config.yml and open file
+        # Check if config.yml exists, if not, copy from config-example.yml to config.yml and open file
+        elif os.path.exists(os.path.join(path,'config.yml')) == False:
+            print('Config file does not exist. Copying from config-example.yml')
+            shutil.copy(os.path.join(path,'config-example.yml'), os.path.join(path,'config.yml'))
+            configFile = os.path.join(path,'config.yml')
+            print("Opening config file for editing")
+            if sys.platform.startswith('darwin'):
+                subprocess.call(('open', configFile))
+            elif os.name == 'nt':   # For Windows
+                os.startfile(configFile)
+            elif os.name == 'posix':   # For Linux, Unix, etc.
+                subprocess.call(('xdg-open', configFile))
+            sys.exit(0)
         # Otherwise, use the standard config.yml
         else:
             configFile = os.path.join(path,'config.yml')
