@@ -2,6 +2,7 @@
 apitoken.txt
 src/apitoken.txt
 src/config-devel.yml
+src/config.yml
 return-archive
 *.csv
 *.db
