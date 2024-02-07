@@ -38,3 +38,8 @@ ps_api_url: https://school.example.com
 # PowerSchool Client Secrets {Client ID:Client Secret}
 ps_client_id: 123456
 ps_client_secret: abcdef
+# Instead of home room, get a student's daily schedule from PowerSchool for daily report
+schedule_from_ps: false
+# If we're getting the schedule from PowerSchool, what what terms should we use?
+# You can find these under Years & Terms for each school
+schedule_terms: ['3300', '3301', '3302']
