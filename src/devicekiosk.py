@@ -250,13 +250,47 @@ class UI(QObject):
     @pyqtSlot()
     def printTicket(self):
         date = datetime.datetime.now()
-        ticket = self.schoolLogo + "\nEmail: " + self.emailAddress + "\nService Tag: " + self.serialNumber + "\nDate: " + date.strftime("%x") + "\nDescription: " + self.description
-        ticket += "\n\n\n----- IT Use -----\n\n\nTicket Number: \n\n\n\n\n\nDate Completed:\n\n\n\n\n\nAdditional Information:"
+        ticket = self.schoolLogo + "\n\n\nEmail: " + self.emailAddress + "\nService Tag: " + self.serialNumber + "\nDate: " + date.strftime("%x") + "\nDescription: " + self.description
+        ticket += "\n\n\n----- IT Use -----\n\n\nTicket Number: \n\n\n\n\n\nDate Completed:\n\n\n\n"
+
+        if (self.config["schedule_from_ps"] == True):
+            ticket += self.getStudentSchedule(ticket)
+
+        ticket += "\n\n\nAdditional Information:"
         print(ticket)
         lpr = subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
         lpr.communicate(bytes(ticket, 'utf-8'))
         self.enableNextSignal.emit()
 
+    def getStudentSchedule(self, ticket):
+        schedule = "---- Student Schedule -----\n"
+        try:
+            self.authenticateWithPowerSchool()
+            studentNumber = self.getStudentNumberFromEmailAddress(self.emailAddress)
+            print(studentNumber)
+            url = self.config["ps_api_url"] + "/ws/schema/query/us.ct.k12.tolland.devicekiosk.students.get_schedule"
+            payload = {"studentNumber": studentNumber, "terms": self.config["schedule_terms"]}
+            print(payload)
+            headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "Authorization": "Bearer " + self.powerschoolAuthorizationToken
+            }
+            response = requests.request("POST", url, json=payload, headers=headers)
+            data = response.json()
+            for item in data["record"]:
+                period = item["external_expression"]
+                lastName = item["last_name"]
+                room = item["room"]
+                line = period + " - " + lastName + " - " + room + "\n"
+                schedule += line
+        except Exception as e:
+            print("An error occurred:", str(e))
+
+        # print(data)
+        # schedule += str(data)
+        return schedule;
+        
     # Submit the QML form from Submit.qml and move user to the next screen
     @pyqtSlot()
     def submitPrint(self):
