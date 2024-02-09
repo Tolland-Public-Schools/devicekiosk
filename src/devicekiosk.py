@@ -289,7 +289,7 @@ class UI(QObject):
 
         # print(data)
         # schedule += str(data)
-        return schedule;
+        return schedule
         
     # Submit the QML form from Submit.qml and move user to the next screen
     @pyqtSlot()
