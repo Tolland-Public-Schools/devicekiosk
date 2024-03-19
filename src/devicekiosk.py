@@ -254,7 +254,7 @@ class UI(QObject):
         ticket += "\n\n\n----- IT Use -----\n\n\nTicket Number: \n\n\n\n\n\nDate Completed:\n\n\n\n"
 
         if (self.config["schedule_from_ps"] == True):
-            ticket += self.getStudentSchedule(ticket)
+            ticket += self.getStudentSchedule()
 
         ticket += "\n\n\nAdditional Information:"
         print(ticket)
@@ -262,14 +262,12 @@ class UI(QObject):
         lpr.communicate(bytes(ticket, 'utf-8'))
         self.enableNextSignal.emit()
 
-    def getStudentSchedule(self, ticket):
+    def getStudentSchedule(self):
         schedule = "---- Student Schedule -----\n"
         try:
             self.authenticateWithPowerSchool()
-            studentNumber = self.getStudentNumberFromEmailAddress(self.emailAddress)
-            print(studentNumber)
             url = self.config["ps_api_url"] + "/ws/schema/query/us.ct.k12.tolland.devicekiosk.students.get_schedule"
-            payload = {"studentNumber": studentNumber, "terms": self.config["schedule_terms"]}
+            payload = {"studentNumber": self.studentID, "terms": self.config["schedule_terms"]}
             print(payload)
             headers = {
                 "Content-Type": "application/json",
