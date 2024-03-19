@@ -7,14 +7,19 @@ Item {
     Connections {
         target: ui
         function onShowDailyLoanersSignal() {
-            btnDailyDeviceLoaner.visible = true;
-            btnDailyDeviceLoanerReturn.visible = true;
-            btnDailyCharger.visible = true;
-            btnDailyChargerReturn.visible = true;
+            dailyLoanerDeviceRow.visible = true;
+            // btnDailyDeviceLoaner.visible = true;
+            // btnDailyDeviceLoanerReturn.visible = true;
+            dailyLoanerChargerRow.visible = true;
+            // btnDailyCharger.visible = true;
+            // btnDailyChargerReturn.visible = true;
             btnDailyReport.visible = true;
         }
         function onShowLoanersReportSignal(){
             btnLoanerReport.visible = true;
+        }
+        function onShowStaffSubBorrowSignal(){
+            staffBorrowRow.visible = true;
         }
     }
     
@@ -55,13 +60,16 @@ Item {
         }
 
         RowLayout {
+            id: dailyLoanerDeviceRow
+            visible: false
             Button {
                 id: btnDailyDeviceLoaner
                 text: "Borrowing a laptop for the day"
                 font.pointSize: 50
-                Layout.fillWidth: true
+                Layout.preferredWidth: parent.width / 2
+                // Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: false
+                // visible: false
                 onClicked: {
                     // ui.toEmail()
                     // contentFrame.push(Qt.createComponent("Email.qml"))
@@ -74,7 +82,7 @@ Item {
                 font.pointSize: 50
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: false
+                // visible: false
                 onClicked: {
                     // ui.toEmail()
                     // contentFrame.push(Qt.createComponent("Email.qml"))
@@ -84,13 +92,16 @@ Item {
         }
 
         RowLayout {
+            id: dailyLoanerChargerRow
+            visible: false
             Button {
                 id: btnDailyCharger
                 text: "Borrowing a charger for the day"
                 font.pointSize: 50
-                Layout.fillWidth: true
+                Layout.preferredWidth: parent.width / 2
+                // Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: false
+                // visible: false
                 onClicked: {
                     // ui.toEmail()
                     // contentFrame.push(Qt.createComponent("Email.qml"))
@@ -103,7 +114,7 @@ Item {
                 font.pointSize: 50
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: false
+                // visible: false
                 onClicked: {
                     // ui.toEmail()
                     // contentFrame.push(Qt.createComponent("Email.qml"))
@@ -111,47 +122,76 @@ Item {
                 }
             }      
         }
-        
 
-        
-
-        Button {
-            id: btnDropOff
-            text: "Dropping Off for Repair"
-            font.pointSize: 50
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            onClicked: {
-                // ui.toEmail()
-                // contentFrame.push(Qt.createComponent("Email.qml"))
-                ui.start(1)
+        RowLayout {
+            id: staffBorrowRow
+            visible: false
+            Button {
+                id: btnStaffBorrow
+                text: "Sub/Staff Device Check-out"
+                font.pointSize: 50
+                Layout.preferredWidth: parent.width / 2
+                // Layout.fillWidth: true
+                Layout.fillHeight: true
+                onClicked: {
+                    ui.start(7)
+                }
+            }
+            Button {
+                id: btnStaffReturn
+                text: "Sub/Staff Device Check-in"
+                font.pointSize: 50
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                onClicked: {
+                    ui.start(8)
+                }
             }
         }
-        Button {
-            id: btnPickUp
-            text: "Picking Up Repaired Device"
-            font.pointSize: 50
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            onClicked: {
-                // ui.toEmail()
-                // contentFrame.push(Qt.createComponent("Email.qml"))
-                ui.start(2)
+
+        RowLayout {
+            Button {
+                id: btnDropOff
+                text: "\nDropping Off for Repair\n"
+                font.pointSize: 50
+                Layout.preferredWidth: parent.width / 2
+                // Layout.fillWidth: true
+                Layout.fillHeight: true
+                onClicked: {
+                    // ui.toEmail()
+                    // contentFrame.push(Qt.createComponent("Email.qml"))
+                    ui.start(1)
+                }
+            }
+            Button {
+                id: btnPickUp
+                text: "\nPicking Up Repaired Device\n"
+                font.pointSize: 50
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                onClicked: {
+                    // ui.toEmail()
+                    // contentFrame.push(Qt.createComponent("Email.qml"))
+                    ui.start(2)
+                }
             }
         }
+
+        
         RowLayout {
             // Will be handy when PySide6 supports uniformCellSizes
             // uniformCellSizes: true
             Button {
-            id: btnDailyReport
-            text: "Print Daily Report"
-            visible: false
-            font.pointSize: 50
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            onClicked: {
-                ui.dailyReport()
-            }
+                id: btnDailyReport
+                text: "Print Daily Report"
+                visible: false
+                font.pointSize: 50
+                Layout.preferredWidth: parent.width / 2
+                // Layout.fillWidth: true
+                Layout.fillHeight: true
+                onClicked: {
+                    ui.dailyReport()
+                }
             }
             Button {
                 id: btnLoanerReport

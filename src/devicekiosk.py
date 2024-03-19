@@ -37,6 +37,8 @@ class ServiceMode(Enum):
     dailyChargerBorrow = 4
     dailyDeviceReturn = 5
     dailyChargerReturn = 6
+    staffDeviceBorrow = 7
+    staffDeviceReturn = 8
 
 # UI handles all of the logic for the app and passes data to the QML UI
 class UI(QObject):
@@ -49,6 +51,7 @@ class UI(QObject):
     # self.[signal].emit(argument)
     showDailyLoanersSignal = pyqtSignal()
     showLoanersReportSignal = pyqtSignal()
+    showStaffSubBorrowSignal = pyqtSignal()
     showUserSignal = pyqtSignal()
     showEmailScreenSignal = pyqtSignal()
     startOverSignal = pyqtSignal()
@@ -170,6 +173,12 @@ class UI(QObject):
             self.showLoanersReportSignal.emit()
         else:
             print("keeping loaner report hidden")
+        
+        if (self.config["show_staff_sub_borrow"] == True):
+            print("showing staff sub borrow")
+            self.showStaffSubBorrowSignal.emit()
+        else:
+            print("keeping staff sub borrow hidden")
 
     # Receive data from User.qml and direct set the correct next screen based on the service mode
     @pyqtSlot(list)
