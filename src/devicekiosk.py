@@ -601,6 +601,9 @@ class UI(QObject):
         emailParts = emailAddress.split("@") 
         user = emailParts[0]
         # The student number is the last 5 characters of the email address
+        if (len(user) < 6):
+            print("ERROR: getStudentNumberFromEmailAddress: impossible username and student number, using 00000")
+            return 00000
         studentNumber = user[-5:]
         print("Student number: " + studentNumber)
         return studentNumber
@@ -641,6 +644,10 @@ class UI(QObject):
         response = requests.request("POST", url, json=payload, headers=headers)
         data = response.json()
         # PowerSchool response will look like this: {"record":[{"home_room":"Last - First - Room"}],"@extensions":""}
+        if ("record" not in data):
+            # If no key "record"
+            return "room not found"
+
         home_room = data["record"][0]["home_room"]
         print(home_room)
         return home_room
