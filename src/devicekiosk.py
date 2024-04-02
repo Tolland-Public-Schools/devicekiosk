@@ -343,6 +343,9 @@ class UI(QObject):
         self.showFinishDailyBorrowSignal.emit()
 
     # On startup, we'll create the daily loaner table in daily.db if it doesn't exist
+    # TODO: Add checks for the table and columns and update as necessary for new versions
+    # For 2.3.0
+    # alter table DAILY add Is_Staff integer default 0 not null;
     def createDailyTableIfNotExists(self):
         print("Creating daily table if it doesn't exist")
         query = """ CREATE TABLE IF NOT EXISTS DAILY(
