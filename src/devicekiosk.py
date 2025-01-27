@@ -42,16 +42,18 @@ class ServiceMode(Enum):
 
 # UI handles all of the logic for the app and passes data to the QML UI
 class UI(QObject):
-    majorVersion = 1
-    minorVersion = 0
-    build = 1
+    majorVersion = 2
+    minorVersion = 3
+    build = 0
 
     # Signals are special functions that allow a message to be sent from Python to QML UI
     # Instead of calling like a regular function, we call them as:
     # self.[signal].emit(argument)
-    showDailyLoanersSignal = pyqtSignal()
-    showLoanersReportSignal = pyqtSignal()
+    enableDailyLoanersSignal = pyqtSignal()
+    enableLoanersReportSignal = pyqtSignal()
+    enableStaffSubBorrowSignal = pyqtSignal()
     showStaffSubBorrowSignal = pyqtSignal()
+    showStaffSubReturnSignal = pyqtSignal()
     showUserSignal = pyqtSignal()
     showEmailScreenSignal = pyqtSignal()
     startOverSignal = pyqtSignal()
@@ -164,19 +166,19 @@ class UI(QObject):
     def showHideDailyLoaners(self):
         if (self.config["show_daily_loaner"] == True):
             print("showing daily loaners")
-            self.showDailyLoanersSignal.emit()
+            self.enableDailyLoanersSignal.emit()
         else:
             print("keeping daily loaners hidden")
         
         if (self.config["show_loaner_report"] == True):
             print("showing loaner report")
-            self.showLoanersReportSignal.emit()
+            self.enableLoanersReportSignal.emit()
         else:
             print("keeping loaner report hidden")
         
         if (self.config["show_staff_sub_borrow"] == True):
             print("showing staff sub borrow")
-            self.showStaffSubBorrowSignal.emit()
+            self.enableStaffSubBorrowSignal.emit()
         else:
             print("keeping staff sub borrow hidden")
 
@@ -227,6 +229,8 @@ class UI(QObject):
             self.showReturnSignal.emit()
         elif (self.serviceMode == ServiceMode.dailyChargerReturn):
             self.showReturnSignal.emit()
+        elif(self.serviceMode == ServiceMode.staffDeviceBorrow):
+            self.showStaffSubBorrowSignal.emit()
         else:
             self.showUserSignal.emit()
 

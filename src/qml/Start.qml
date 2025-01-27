@@ -6,7 +6,7 @@ import QtQuick.Layouts
 Item {
     Connections {
         target: ui
-        function onShowDailyLoanersSignal() {
+        function onEnableDailyLoanersSignal() {
             dailyLoanerDeviceRow.visible = true;
             // btnDailyDeviceLoaner.visible = true;
             // btnDailyDeviceLoanerReturn.visible = true;
@@ -15,10 +15,10 @@ Item {
             // btnDailyChargerReturn.visible = true;
             btnDailyReport.visible = true;
         }
-        function onShowLoanersReportSignal(){
+        function onEnableLoanersReportSignal(){
             btnLoanerReport.visible = true;
         }
-        function onShowStaffSubBorrowSignal(){
+        function onEnableStaffSubBorrowSignal(){
             staffBorrowRow.visible = true;
         }
     }

@@ -94,6 +94,14 @@ ApplicationWindow {
             contentFrame.push(Qt.createComponent("FinishDailyReturn.qml"))
         }
 
+        function onShowStaffSubBorrowSignal() {
+            contentFrame.push(Qt.createComponent("StaffSubBorrow.qml"))
+        }
+
+        function onShowStaffSubReturnSignal() {
+            contentFrame.push(Qt.createComponent("StaffSubReturn.qml"))
+        }
+
         function onShowEOYReturnSignal() {
             // contentFrame.clear()
             contentFrame.push(Qt.createComponent("EOYReturn.qml"))
