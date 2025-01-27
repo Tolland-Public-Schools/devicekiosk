@@ -360,7 +360,8 @@ class UI(QObject):
                     Date_Returned TEXT,
                     Serial TEXT NOT NULL,
                     Device TEXT NOT NULL,
-                    Homeroom TEXT
+                    Homeroom TEXT,
+                    Is_Staff INTEGER DEFAULT 0 NOT NULL
                     ); """
         try:   
             # Connect to DB and create a cursor
@@ -379,6 +380,61 @@ class UI(QObject):
             if sqliteConnection:
                 sqliteConnection.close()
                 print('SQLite Connection closed')
+    
+    # Make any necessary database table updates
+    def updateDatabaseTables(self):
+        print("Updating database tables")
+        self.addIsStaffColumn()
+
+    def addIsStaffColumn(self):
+        print("Updating database tables - Adding Is_Staff column to DAILY if necessary")
+        query = """SELECT COUNT(*) AS CNTREC FROM pragma_table_info('DAILY') WHERE name='Is_Staff';"""
+        columnExists = False
+        try:   
+            # Connect to DB and create a cursor
+            path = os.path.dirname(os.path.abspath(__file__))
+            db = os.path.join(path,'daily.db')
+            sqliteConnection = sqlite3.connect(db)
+            cursor = sqliteConnection.cursor()
+            result = cursor.execute(query).fetchall()
+            if (result[0][0] > 0):
+                columnExists = True
+            cursor.execute(query)
+            cursor.close()
+        # Handle errors
+        except sqlite3.Error as error:
+            print('Error occurred - ', error) 
+        # Close DB Connection irrespective of success
+        # or failure
+        finally:        
+            if sqliteConnection:
+                sqliteConnection.close()
+                print('SQLite Connection closed')
+
+        # Fetch and output result
+        if not columnExists:
+            print("Adding Is_Staff column to DAILY")
+            query = """ALTER TABLE DAILY ADD Is_Staff INTEGER DEFAULT 0 NOT NULL;"""
+            try:   
+                # Connect to DB and create a cursor
+                path = os.path.dirname(os.path.abspath(__file__))
+                db = os.path.join(path,'daily.db')
+                sqliteConnection = sqlite3.connect(db)
+                cursor = sqliteConnection.cursor()
+                cursor.execute(query)
+                cursor.close()
+            # Handle errors
+            except sqlite3.Error as error:
+                print('Error occurred - ', error)
+            # Close DB Connection irrespective of success
+            # or failure
+            finally:
+                if sqliteConnection:
+                    sqliteConnection.close()
+                    print('SQLite Connection closed')
+        else:
+            print("Is_Staff column already exists")
+
 
     # Add a daily loaner dervice to the daily.db database
     def addLoanerToDB(self, device):
@@ -933,6 +989,7 @@ def main():
     ui.loadConfig()
     ui.loadSchoolLogo()
     ui.createDailyTableIfNotExists()
+    ui.updateDatabaseTables()
     
     engine = QQmlApplicationEngine()
     # Bind objects to the QML
