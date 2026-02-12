@@ -32,16 +32,16 @@ Item {
         anchors.fill: parent
         // spacing: 2
 
-        Text {
+        Label {
             id: txtIntro
             Layout.fillWidth: true
             Layout.fillHeight: true
 
             text: "How can we help you?"
             // anchors.fill: self
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            wrapMode: Text.WordWrap
+            horizontalAlignment: Label.AlignHCenter
+            verticalAlignment: Label.AlignVCenter
+            wrapMode: Label.WordWrap
             font.pointSize: 30
             // fontSizeMode: Text.Fit
             // minimumPixelSize: 30
