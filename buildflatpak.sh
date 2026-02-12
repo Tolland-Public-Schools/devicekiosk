@@ -24,10 +24,10 @@ flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flat
 
 echo "Installing the KDE flatpak runtime and SDK"
 #flatpak -y install org.kde.Platform/x86_64/5.15-23.08
-flatpak -y install org.kde.Platform/x86_64/6.9 org.kde.Sdk/x86_64/6.9
+sudo flatpak -y install org.kde.Platform/x86_64/6.9 org.kde.Sdk/x86_64/6.9
 
 echo "Installing PySide6 Baseapp"
-flatpak -y install app/io.qt.PySide.BaseApp/x86_64/6.9
+sudo flatpak -y install app/io.qt.PySide.BaseApp/x86_64/6.9
 
 echo "Building Flatpak"
 flatpak-builder --verbose --force-clean flatpak-build-dir us.ct.k12.tolland.devicekiosk.json --repo=repo
