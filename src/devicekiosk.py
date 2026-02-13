@@ -208,7 +208,7 @@ class UI(QObject):
             self.showReturnSignal.emit()
         
     # Receive the serial number from Device.qml or Pickup.qml and set the screen in QML based on the service mode
-    @Slot('QString')
+    @Slot(str)
     def submitSerial(self, serial):
         self.serialNumber = serial
         self.serialNumber = self.serialNumber.replace(" ", "")      
@@ -219,7 +219,7 @@ class UI(QObject):
 
     # Receive the service mode from Start.qml and set the service mode in Python
     # Start.qml is the default screen loaded in the Main.qml StackView
-    @Slot('int')
+    @Slot(int)
     def start(self, mode):
         self.serviceMode = ServiceMode(mode)
         print("Service mode: ")
@@ -245,7 +245,7 @@ class UI(QObject):
 
 
     # Receive the problem description from Description.qml and set the screen in QML based on the service mode
-    @Slot('QString')
+    @Slot(str)
     def submitDescription(self, description):
         self.description = description
         print("Problem Descritpion:")
@@ -314,7 +314,7 @@ class UI(QObject):
 
     # Receive loaner information from Loaner.qml, DailyLoanerDevice.qml, or DailyLoanerCharger.qml
     # Move user to the next screen based on the service mode
-    @Slot('QString')
+    @Slot(str)
     def submitLoaner(self, serial):
         self.loanerSerialNumber = serial
         # Remove superflous spaces
@@ -337,7 +337,7 @@ class UI(QObject):
             self.showSubmitSignal.emit()
 
     # Receive the homeroom from Homeroom.qml and set the screen in QML
-    @Slot('QString')
+    @Slot(str)
     def submitHomeroom(self, homeroom):
         self.homeroom = homeroom
         if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
@@ -506,7 +506,7 @@ class UI(QObject):
         s.close()
     
     # Receive the returned device serial number from Return.qml and set the screen in QML based on the service mode
-    @Slot('QString')
+    @Slot(str)
     def submitReturn(self, serial):
         self.loanerSerialNumber = serial
         # Remove superflous spaces
@@ -596,7 +596,7 @@ class UI(QObject):
         self.showEOYReturnSignal.emit()
 
     # Completes the EOY return process
-    @Slot('QString')
+    @Slot(str)
     def submitEOYFinish(self, returnEmail):
         self.emailEOYReturnFiles(returnEmail)
         self.archiveReturns()
@@ -829,7 +829,7 @@ class UI(QObject):
             if sqliteConnection:
                 sqliteConnection.close()
                 print('SQLite Connection closed')
-            return report
+        return report
     
     def printBorrowReport(self, report):
         lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
