@@ -53,7 +53,7 @@ Item {
             }
         }
 
-        Text {
+        Label {
             id: txtError
             Layout.fillWidth: true
             Layout.fillHeight: true
