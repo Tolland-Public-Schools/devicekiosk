@@ -4,12 +4,29 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 Item {
+    Connections {
+        target: ui        
 
+        Component.onCompleted: {
+            appWindow.setInitialPage()
+        }
+    }
+
+    function firstLastInputChange(){
+        verifyForm()
+        setEmail()
+    }
+
+    function setEmail() {
+        if (ui.getServiceMode() == 7) {
+            inputEmail.text = inputFirst.text[0].toLowerCase() + inputLast.text.toLowerCase() + "@tolland.k12.ct.us"
+        }
+    }
+    
     function verifyForm() {
-        if (
-            inputFirst.text.toString().length > 0 &&
+        if (inputFirst.text.toString().length > 0 &&
             inputLast.text.toString().length > 0 &&
-            inputID.text.toString().length > 0
+            (inputID.text.toString().length > 0 || ui.getServiceMode() == 7)
         ) {        
             btnNext.enabled = true
         }
@@ -18,7 +35,8 @@ Item {
         }
     }
 
-    function setFocus() {
+    function setupUsers() {
+        configureUser()
         inputFirst.focus = true
         inputFirst.forceActiveFocus()
     }
@@ -48,7 +66,7 @@ Item {
             Layout.fillHeight: true
             focus: true
             onTextChanged: {
-                verifyForm()
+                firstLastInputChange()
             }
             
             Component.onCompleted: {
@@ -64,7 +82,7 @@ Item {
             Layout.fillHeight: true
             focus: true
             onTextChanged: {
-                verifyForm()
+                firstLastInputChange()
             }
         }
         TextField {
@@ -74,6 +92,18 @@ Item {
             Layout.fillWidth: true
             Layout.fillHeight: true
             focus: true
+            onTextChanged: {
+                verifyForm()
+            }
+        }
+        TextField {
+            id: inputEmail
+            placeholderText: qsTr("Email Address")
+            font.pointSize: 20
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            focus: true
+            visible: false
             onTextChanged: {
                 verifyForm()
             }
@@ -109,12 +139,26 @@ Item {
             }
         }
     }
+
+    // Automatically go to a non-standard kiosk mode start page
+    function configureUser() {
+        switch(ui.getServiceMode()) {
+            case 7:
+                // serviceMode = 7
+                inputID.visible = false
+                inputEmail.visible = true
+                break;
+            default:
+                break;
+        }
+    }
+
     // Setting focus any other way doesn't seem to work. 
     // Kind of kludge, but works
     Timer {
         interval: 100
         running: true
         repeat: false
-        onTriggered: setFocus()
+        onTriggered: setupUsers()
     }
 }

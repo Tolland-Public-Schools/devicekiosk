@@ -8,7 +8,7 @@ Item {
         target: ui        
 
         function onShowOutstandingLoansSignal(serials) {
-            txtInstructions.text += "\nNOTE: The following device(s) are currently checked out by this student: " + serials + "\n"
+            txtInstructions.text += "\nNOTE: The following device(s) are currently checked out by this user: " + serials + "\n"
         }
     }
 

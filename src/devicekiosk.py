@@ -52,7 +52,6 @@ class UI(QObject):
     enableDailyLoanersSignal = Signal()
     enableLoanersReportSignal = Signal()
     enableStaffSubBorrowSignal = Signal()
-    showStaffSubBorrowSignal = Signal()
     showStaffSubReturnSignal = Signal()
     showUserSignal = Signal()
     showEmailScreenSignal = Signal()
@@ -136,6 +135,11 @@ class UI(QObject):
     @Slot(result=int)
     def getKioskMode(self):
         return self.config["kiosk_mode"]
+    
+    # Set the service mode from the QML UI
+    @Slot(result=int)
+    def getServiceMode(self):
+        return self.serviceMode.value
 
     # For single user mode (all tickets go in from the same user), load the username from the config file
     @Slot(result=str)
@@ -229,8 +233,8 @@ class UI(QObject):
             self.showReturnSignal.emit()
         elif (self.serviceMode == ServiceMode.dailyChargerReturn):
             self.showReturnSignal.emit()
-        elif(self.serviceMode == ServiceMode.staffDeviceBorrow):
-            self.showStaffSubBorrowSignal.emit()
+        elif(self.serviceMode == ServiceMode.staffDeviceReturn):
+            self.showReturnSignal.emit()
         else:
             self.showUserSignal.emit()
 
