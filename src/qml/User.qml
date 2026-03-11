@@ -118,7 +118,7 @@ Item {
             Layout.fillHeight: true
 
             onClicked: {
-                var userInfo = [inputFirst.text, inputLast.text, inputID.text]
+                var userInfo = [inputFirst.text, inputLast.text, inputID.text, inputEmail.text]
                 // ui.firstName = inputFirst.text
                 // ui.lastName = inputLast.text
                 // ui.studenID = inputID.text

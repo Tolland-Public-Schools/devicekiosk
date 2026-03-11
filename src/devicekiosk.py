@@ -193,16 +193,21 @@ class UI(QObject):
         self.firstName = userInfo[0]        
         self.lastName = userInfo[1]        
         self.studentID = userInfo[2]
+        
         # Strip spaces. Some users were putting spaces after their first and last name
         self.firstName = self.firstName.replace(" ", "")
         self.lastName = self.lastName.replace(" ", "")
         self.studentID = self.studentID.replace(" ", "")
-        self.emailAddress = self.firstName + self.lastName + self.studentID + "@tolland.k12.ct.us"
-        print("Student email is: " + self.emailAddress)
+        if(self.serviceMode == ServiceMode.staffDeviceBorrow):
+            self.emailAddress = userInfo[3].replace(" ", "")
+        else:
+            self.emailAddress = self.firstName + self.lastName + self.studentID + "@tolland.k12.ct.us"
+        print("User email is: " + self.emailAddress)
         print("Service mode is: " + str(self.serviceMode))
         if (self.serviceMode == ServiceMode.dropoff):
             self.showDescriptionSignal.emit()
-        elif (self.serviceMode == ServiceMode.dailyDeviceBorrow):
+        elif (self.serviceMode == ServiceMode.dailyDeviceBorrow
+              or self.serviceMode == ServiceMode.staffDeviceBorrow):
             print("Python daily device mode")
             self.showDailyLoanerDeviceScreenSignal.emit()
         elif (self.serviceMode == ServiceMode.dailyChargerBorrow):
@@ -324,7 +329,7 @@ class UI(QObject):
         # Remove superflous spaces
         self.loanerSerialNumber = self.loanerSerialNumber.replace(" ", "")
         if (self.serviceMode == ServiceMode.dailyDeviceBorrow):
-            # self.sendDailyEmail()            
+            # self.sendDailyEmail()        
             if (self.config["show_homeroom_page"]):
                 self.showDailyHomeroomPageSignal.emit()
             else:
@@ -337,6 +342,9 @@ class UI(QObject):
             else:
                 self.addLoanerToDB("Charger")
                 self.showFinishDailyBorrowSignal.emit()
+        elif (self.serviceMode == ServiceMode.staffDeviceBorrow):
+            self.addLoanerToDB("Laptop")
+            self.showFinishDailyBorrowSignal.emit()
         else:
             self.showSubmitSignal.emit()
 
@@ -451,10 +459,13 @@ class UI(QObject):
             db = os.path.join(path,'daily.db')
             sqliteConnection = sqlite3.connect(db)
             cursor = sqliteConnection.cursor()
+            isStaff = False
+            if (self.serviceMode == ServiceMode.staffDeviceBorrow):
+                isStaff = True
                     
             # Write a query and execute it with cursor
-            query = "INSERT INTO DAILY (Email, First_Name, Last_Name, Date_Borrowed, Serial, Device, Homeroom) VALUES (?, ?, ?, DATE('now'), ?, ?, ?)"
-            args = (self.emailAddress.lower(), self.firstName, self.lastName, self.loanerSerialNumber.lower(), device, self.homeroom)
+            query = "INSERT INTO DAILY (Email, First_Name, Last_Name, Date_Borrowed, Serial, Device, Homeroom, Is_Staff) VALUES (?, ?, ?, DATE('now'), ?, ?, ?, ?)"
+            args = (self.emailAddress.lower(), self.firstName, self.lastName, self.loanerSerialNumber.lower(), device, self.homeroom, isStaff)
             cursor.execute(query, args)
             sqliteConnection.commit()
         
