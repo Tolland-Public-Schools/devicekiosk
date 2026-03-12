@@ -517,7 +517,7 @@ class UI(QObject):
         try:
             s.send_message(msg)
         except smtplib.SMTPException as ex:
-            self.errorMessage = ex
+            self.setError("Error sending email: " + str(ex))
         s.close()
     
     # Receive the returned device serial number from Return.qml and set the screen in QML based on the service mode
@@ -582,10 +582,10 @@ class UI(QObject):
     def submitTicket(self):
         print("submitting ticket")
         self.postToZenDesk()
-        if (not self.errorMessage == ""):
+        if (not str(self.errorMessage) == ""):
             return
         self.sendEmail()
-        if (not self.errorMessage == ""):
+        if (not str(self.errorMessage) == ""):
             return
         self.enableNextSignal.emit()
     
@@ -878,7 +878,7 @@ class UI(QObject):
         try:
             s.send_message(msg)
         except smtplib.SMTPException as ex:
-            self.errorMessage = ex
+            self.setError("Error sending email: " + str(ex))
         s.close()
         
     # Post the ticket to ZenDesk
@@ -897,7 +897,7 @@ class UI(QObject):
         response = requests.post(url, data=payload, auth=(user, pwd), headers=headers)
         # Check for HTTP codes other than 201 (Created)
         if response.status_code != 201:
-            self.errorMessage = response.status_code
+            self.setError("Failed to create ticket: " + str(response.status_code) + " - " + response.text)  
             self.showErrorSignal.emit('Error: ' + str(response.status_code))
             self.showErrorPageSignal.emit()
             return
@@ -952,7 +952,7 @@ class UI(QObject):
         try:
             s.send_message(msg)
         except smtplib.SMTPException as ex:
-            self.errorMessage = ex
+            self.setError("Error sending email: " + str(ex))
         s.close()
 
     # Email the end of year return files to the email address in the config file
@@ -980,7 +980,7 @@ class UI(QObject):
         try:
             s.send_message(msg)
         except smtplib.SMTPException as ex:
-            self.errorMessage = ex
+            self.setError("Error sending email: " + str(ex))
             print("Email error " + str(ex))
         s.close()
 
@@ -1011,6 +1011,9 @@ class UI(QObject):
         for file in os.listdir(workingDir):
             if file.endswith(".csv"):
                 shutil.move(os.path.join(workingDir, file), archiveDir)
+    
+    def setError(self, error):
+        self.errorMessage = str(error)
 
 # Main function
 # This sets up the QML UI  with Main.qml and starts the app
