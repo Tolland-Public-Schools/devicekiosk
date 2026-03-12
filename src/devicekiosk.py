@@ -636,7 +636,7 @@ class UI(QObject):
             cursor = sqliteConnection.cursor()
                     
             # Write a query and execute it with cursor
-            query = "SELECT * FROM DAILY WHERE Date_Returned IS NULL"
+            query = "SELECT * FROM DAILY WHERE Date_Returned IS NULL ORDER BY Is_Staff ASC, Last_Name ASC"
             cursor.execute(query)
         
             # Fetch and output result
@@ -645,7 +645,9 @@ class UI(QObject):
                 # print(row[0])
                 body += row[1] + " " + row[2] + ": " + row[6] + " #: " + row[5] + " Borrowed: " + row[3]
                 # If the homeroom is set to be pulled from PowerSchool, add the homeroom to the report
-                if (self.config["homeroom_from_ps"] == True):
+                if (row[8] == True):
+                    body += " (Staff)"
+                elif (self.config["homeroom_from_ps"] == True):
                     studentNumber = self.getStudentNumberFromEmailAddress(row[0])
                     homeroom = self.getHomeRoomFromPowerSchool(studentNumber)
                     body += " Home Room: " + homeroom
@@ -812,10 +814,10 @@ class UI(QObject):
             cursor = sqliteConnection.cursor()
                     
             # Write a query and execute it with cursor
-            query = """SELECT Last_Name, First_Name, COUNT(*) AS count FROM DAILY WHERE Device = ? AND
+            query = """SELECT Last_Name, First_Name, COUNT(*) AS count, IS_STAFF FROM DAILY WHERE Device = ? AND
                 date_borrowed BETWEEN ? AND 'now'
                 GROUP BY Last_Name, First_Name
-                ORDER BY count DESC, Last_Name ASC;"""
+                ORDER BY IS_Staff ASC, count DESC, Last_Name ASC;"""
             args = (deviceType, currentSchoolYear + "-08-01")
             
             
@@ -827,7 +829,10 @@ class UI(QObject):
                 last_name = row[0] if row[0] is not None else ""
                 first_name = row[1] if row[1] is not None else ""
                 count = str(row[2]) if row[2] is not None else "0"
-                report += last_name + ", " + first_name + ": " + count + "\n"
+                report += last_name + ", " + first_name + ": " + count
+                if row[3] == True:
+                    report += " (Staff)"
+                report += "\n"
                         
             # Close the cursor
             cursor.close()
