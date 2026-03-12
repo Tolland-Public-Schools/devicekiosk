@@ -2,7 +2,7 @@
 
 # Virtual Environment
 echo "Creating a virtual environment"
-python3 -m venv venv/
+python3.9 -m venv venv/
 source venv/bin/activate
 
 # Build
@@ -34,3 +34,7 @@ flatpak-builder --verbose --force-clean flatpak-build-dir us.ct.k12.tolland.devi
 
 # To test the flatpak
 # flatpak-builder --run flatpak-build-dir us.ct.k12.tolland.devicekiosk.json devicekiosk
+
+echo "Cleaing up"
+rm -rf flatpak-build-dir
+rm -rf .flatpak-builder
