@@ -31,7 +31,7 @@ Item {
             anchors.fill: parent
             // spacing: 2
 
-        Text {
+        Label {
             id: txtMessage
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -44,7 +44,7 @@ Item {
 
         }
 
-        Text {
+        Label {
             id: txtError
             Layout.fillWidth: true
             Layout.fillHeight: true

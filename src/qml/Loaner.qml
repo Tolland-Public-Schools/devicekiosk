@@ -23,7 +23,7 @@ Item {
             anchors.fill: parent
             // spacing: 2
 
-        Text {
+        Label {
             id: txtEmail
             Layout.fillWidth: true
             Layout.fillHeight: true

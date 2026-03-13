@@ -135,7 +135,7 @@ ApplicationWindow {
         id: contentFrame
         initialItem: Qt.createComponent("Start.qml")
         Component.onCompleted: {
-            setInitialPage()
+            appWindow.setInitialPage()
         }
     }
 

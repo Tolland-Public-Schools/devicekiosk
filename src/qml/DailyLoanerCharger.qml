@@ -29,7 +29,7 @@ Item {
             anchors.fill: parent
             // spacing: 2
 
-        Text {
+        Label {
             id: txtInstructions
             Layout.fillWidth: true
             Layout.fillHeight: true

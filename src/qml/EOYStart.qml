@@ -8,7 +8,7 @@ Item {
         anchors.fill: parent
         // spacing: 2
 
-        Text {
+        Label {
             id: txtIntro
             Layout.fillWidth: true
             Layout.fillHeight: true

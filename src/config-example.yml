@@ -43,3 +43,5 @@ schedule_from_ps: false
 # If we're getting the schedule from PowerSchool, what what terms should we use?
 # You can find these under Years & Terms for each school
 schedule_terms: ['3300', '3301', '3302']
+# Should we show the staff/sub device borrow page?
+show_staff_sub_borrow: false
