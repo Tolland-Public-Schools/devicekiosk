@@ -23,6 +23,8 @@ from pathlib import Path
 from enum import Enum
 from email.message import EmailMessage
 
+from send_to_printer import SendToPrinterService, PrinterError
+
 # KioskMode sets the main operational mode that the determines the main screen (Main.qml)
 class KioskMode(Enum):
     normal = 0
@@ -92,6 +94,8 @@ class UI(QObject):
     homeroom = ""
     config = {}
     powerschoolAuthorizationToken = ""
+
+    printerService = SendToPrinterService()
 
     def loadConfig(self):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -280,9 +284,14 @@ class UI(QObject):
 
         ticket += "\n\n\nAdditional Information:"
         print(ticket)
-        lpr = subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
-        lpr.communicate(bytes(ticket, 'utf-8'))
-        self.enableNextSignal.emit()
+
+        try:
+            self.printerService.send_text(ticket)
+        except PrinterError as exc:
+            self.setError("Unable to print ticket: " + str(exc))
+            print(self.errorMessage)
+        finally:
+            self.enableNextSignal.emit()
 
     def getStudentSchedule(self):
         schedule = "---- Student Schedule -----\n"
