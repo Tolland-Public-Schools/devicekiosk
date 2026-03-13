@@ -23,7 +23,7 @@ from pathlib import Path
 from enum import Enum
 from email.message import EmailMessage
 
-from send_to_printer import SendToPrinterService, PrinterError
+from send_to_printer import PrinterService, PrinterError
 
 # KioskMode sets the main operational mode that the determines the main screen (Main.qml)
 class KioskMode(Enum):
@@ -95,7 +95,7 @@ class UI(QObject):
     config = {}
     powerschoolAuthorizationToken = ""
 
-    printerService = SendToPrinterService()
+    printerService = PrinterService()
 
     def loadConfig(self):
         path = os.path.dirname(os.path.abspath(__file__))
@@ -286,7 +286,7 @@ class UI(QObject):
         print(ticket)
 
         try:
-            self.printerService.send_text(ticket)
+            self.printerService.print_job(ticket)
         except PrinterError as exc:
             self.setError("Unable to print ticket: " + str(exc))
             print(self.errorMessage)
@@ -684,8 +684,10 @@ class UI(QObject):
             self.emailDailyReport(body)
 
         if (self.config["print_daily_report"] == True):
-            lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
-            lpr.communicate(bytes(body, 'utf-8'))
+            try:
+                self.printerService.print_job(body)
+            except PrinterError as exc:
+                print("Unable to print daily report: " + str(exc))
 
     def getStudentNumberFromEmailAddress(self, emailAddress):
         print("Getting student number from email address")
@@ -861,8 +863,10 @@ class UI(QObject):
         return report
     
     def printBorrowReport(self, report):
-        lpr =  subprocess.Popen("/usr/bin/lpr", stdin=subprocess.PIPE)
-        lpr.communicate(bytes(report, 'utf-8'))        
+        try:
+            self.printerService.print_job(report)
+        except PrinterError as exc:
+            print("Unable to print borrow report: " + str(exc))
     
     def thisSchoolYear(self):
         today = datetime.date.today()

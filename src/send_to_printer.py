@@ -5,13 +5,13 @@ class PrinterError(Exception):
     pass
 
 
-class SendToPrinterService:
+class PrinterService:
 	"""Helper service that sends text payloads to the local printer via lpr."""
 
 	def __init__(self, lpr_path: str = "/usr/bin/lpr") -> None:
 		self.lpr_path = lpr_path
 
-	def send_text(self, text: str, encoding: str = "utf-8") -> None:
+	def print_job(self, text: str, encoding: str = "utf-8") -> None:
 		if text is None:
 			raise ValueError("text cannot be None")
 
