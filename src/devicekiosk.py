@@ -5,11 +5,7 @@ import requests
 import json
 import smtplib
 import yaml
-import tempfile
-import urllib.request
 import shutil
-import zipfile
-import traceback
 import subprocess
 import uuid
 import sqlite3
