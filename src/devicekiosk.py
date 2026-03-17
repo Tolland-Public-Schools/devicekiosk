@@ -20,7 +20,7 @@ from pathlib import Path
 from enum import Enum
 from email.message import EmailMessage
 
-from send_to_printer import PrinterService, PrinterError
+from printer_service import PrinterService, PrinterError
 
 # KioskMode sets the main operational mode that the determines the main screen (Main.qml)
 class KioskMode(Enum):
