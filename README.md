@@ -3,7 +3,7 @@ Device repair dropoff kiosk app written in Python and QML
 
 Install pre-requisites:
 
-pip install PyQt6 pyinstaller pyyaml
+pip install -r requirements.txt
 
 run with:
 

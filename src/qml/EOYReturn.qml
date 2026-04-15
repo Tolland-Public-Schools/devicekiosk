@@ -43,7 +43,7 @@ Item {
             anchors.fill: parent
             // spacing: 2
 
-        Text {
+        Label {
             id: txtHeader
             Layout.fillWidth: true
             Layout.fillHeight: true

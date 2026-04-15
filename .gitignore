@@ -10,6 +10,7 @@ return-archive
 # IDEs
 .idea
 .vscode
+.continue
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
