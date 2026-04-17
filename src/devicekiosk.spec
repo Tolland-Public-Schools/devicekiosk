@@ -5,10 +5,10 @@ block_cipher = None
 
 
 a = Analysis(['devicekiosk.py'],
-             pathex=[],
+             pathex=[SPECPATH],
              binaries=[],
              datas=[('qml', 'qml'), ('images', 'images'), ('icon', 'icon'), ('config-example.yml', '.')],
-             hiddenimports=[],
+             hiddenimports=['printer_service'],
              hookspath=[],
              hooksconfig={},
              runtime_hooks=[],
