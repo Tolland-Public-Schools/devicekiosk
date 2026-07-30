@@ -7,7 +7,7 @@ import QtMultimedia
 Item {
 
     function verifyForm() {
-        if (inputSerial.text.toString().length > 0) {        
+        if (inputSerial.text.toString().length > 0) {
             btnNext.enabled = true
         }
         else {
@@ -41,7 +41,7 @@ Item {
             id: image
             Layout.alignment: Qt.AlignHCenter
             source: "../images/device.gif"
-            fillMode: Image.Image.PreserveAspectCrop
+            fillMode: Image.PreserveAspectCrop
         }
 
         TextField {
@@ -54,12 +54,12 @@ Item {
             onTextChanged: {
                 verifyForm()
             }
-            
+
             Component.onCompleted: {
                 this.focus = true
                 this.forceActiveFocus()
             }
-        }       
+        }
 
         Button {
             id: btnNext
@@ -74,7 +74,7 @@ Item {
                 // ui.startOver()
             }
         }
-        
+
         Button {
             id: bntStartOver
             text: "Start Over"
@@ -88,7 +88,7 @@ Item {
             }
         }
     }
-    // Setting focus any other way doesn't seem to work. 
+    // Setting focus any other way doesn't seem to work.
     // Kind of kludge, but works
     Timer {
         interval: 100
