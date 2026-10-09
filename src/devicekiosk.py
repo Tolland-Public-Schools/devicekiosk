@@ -42,7 +42,7 @@ class ServiceMode(Enum):
 # UI handles all of the logic for the app and passes data to the QML UI
 class UI(QObject):
     majorVersion = 2
-    minorVersion = 3
+    minorVersion = 4
     build = 0
 
     # Signals are special functions that allow a message to be sent from Python to QML UI
@@ -891,20 +891,39 @@ class UI(QObject):
             self.setError("Error sending email: " + str(ex))
         s.close()
         
+    # Use the new oAuth authentication flow for Zendesk
+    # API tokens have been deprecated
+    def zendeskAuth(self) -> str:
+        response = requests.post(    
+            f"https://{self.config['zendesk_domain']}.zendesk.com/oauth/tokens",    
+            data={        
+                "grant_type": "client_credentials",        
+                "client_id": self.config['zendesk_user'],        
+                "client_secret": self.config["zendesk_token"],        
+                "scope": "tickets:write",    
+                },
+            )
+        response.raise_for_status()
+        data = response.json()
+        access_token = data["access_token"]
+        return access_token
+    
     # Post the ticket to ZenDesk
     def postToZenDesk(self) -> None:
+        access_token = self.zendeskAuth()
         self.errorMessage = ""
         data = self.createZenDeskTicketBody()
         # Encode the data to create a JSON payload
         print(data)
         payload = json.dumps(data)
         # Set the request parameters
-        url = "https://" + self.config["zendesk_domain"] + ".zendesk.com/api/v2/tickets.json"
-        user = self.config["zendesk_user"]
-        pwd = self.config["zendesk_token"]
-        headers = {'content-type': 'application/json'}
+        url = f"https://{self.config['zendesk_domain']}.zendesk.com/api/v2/tickets.json"
+        headers = {
+            'content-type': 'application/json',
+            'Authorization': f"Bearer {access_token}"
+        }
         # Do the HTTP post request
-        response = requests.post(url, data=payload, auth=(user, pwd), headers=headers)
+        response = requests.post(url, data=payload, headers=headers)
         # Check for HTTP codes other than 201 (Created)
         if response.status_code != 201:
             self.setError("Failed to create ticket: " + str(response.status_code) + " - " + response.text)  
